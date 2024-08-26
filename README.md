@@ -1,5 +1,4 @@
-## Next.js App Router Course - Starter
+## Project MIDAS dashboard website.
+Created by Gabriel Hooks and Nghia Vo at USF Tampa.
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
-
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+Next.js 14, app router
