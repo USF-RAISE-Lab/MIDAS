@@ -8,13 +8,27 @@ import {
   Button,
   Divider,
   Tooltip,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Autocomplete,
+  AutocompleteItem,
 } from '@nextui-org/react';
+import {useInfiniteScroll} from "@nextui-org/use-infinite-scroll";
+
 import { Nunito } from 'next/font/google';
 import SimpleLineIconsMagnifier from '@/app/ui/icons/SimpleLineIconsMagnifier';
 import { DonutChart } from '@/app/ui/charts/donut-chart';
 import { StudentDemographics } from '@/app/types/student-demographics';
 import { FormError } from '@/app/ui/form-error';
-import { useState } from 'react';
+import { DemographicsType } from '@/app/ui/charts/demographics-type';
+import useSchoolLevel from '@/hooks/useSchoolLevel';
+import { useEffect, useState } from 'react';
+import Fuse from 'fuse.js'
+import Downshift from 'downshift';
+import { StudentAutocomplete } from '@/app/ui/autocomplete';
+
 const nunito = Nunito({
   weight: ['200', '200'],
   subsets: ['latin'],
@@ -23,37 +37,37 @@ const nunito = Nunito({
 
 const genderDataPlaceholder = [
   {
-    id: 'Male',
+    label: 'Male',
     value: 500,
   },
   {
-    id: 'Female',
+    label: 'Female',
     value: 548,
   },
 ];
 
 const ethnicityDataPlaceholder = [
   {
-    id: 'White',
+    label: 'White',
     value: 358,
   },
   {
-    id: 'Hispanic',
+    label: 'Hispanic',
     value: 300,
   },
   {
-    id: 'Other POC',
+    label: 'Other POC',
     value: 390,
   },
 ];
 
-const englishLearnerDataPlaceholder = [
+const englishLearnerDataPlaceholder: DemographicsType[] = [
   {
-    id: 'Not ELL',
+    label: 'Not ELL',
     value: 800,
   },
   {
-    id: 'ELL',
+    label: 'ELL',
     value: 248,
   },
 ];
@@ -92,13 +106,12 @@ function DemographicsRow({
           className="bg-neutral-100"
           content={
             <div className="h-96 w-96">
-              <p className={`${nunito.className} -mb-4 text-xl`}>
+              <p className={`${nunito.className} text-xl`}>
                 School Gender demographics
               </p>
               <DonutChart
                 data={genderDataPlaceholder}
                 colors={['#f87171', '#a5f3fc']}
-                selectedSlice={content.gender}
               />
             </div>
           }
@@ -123,13 +136,12 @@ function DemographicsRow({
           className="bg-neutral-100"
           content={
             <div className="h-96 w-96">
-              <p className={`${nunito.className} -mb-4 text-xl`}>
+              <p className={`${nunito.className} text-xl`}>
                 School English-learner demographics
               </p>
               <DonutChart
                 data={englishLearnerDataPlaceholder}
                 colors={['#a3a3a3', '#4ade80']}
-                selectedSlice={content.ell}
               />
             </div>
           }
@@ -154,13 +166,12 @@ function DemographicsRow({
           className="bg-neutral-100"
           content={
             <div className="h-96 w-96">
-              <p className={`${nunito.className} -mb-4 text-xl`}>
+              <p className={`${nunito.className} text-xl`}>
                 School Ethnicity demographics
               </p>
               <DonutChart
                 data={ethnicityDataPlaceholder}
                 colors={['#f87171', '#a5f3fc', '#4ade80']}
-                selectedSlice={content.ethnicity}
               />
             </div>
           }
@@ -185,23 +196,23 @@ export default function StudentSearch({
   selectedStudent,
   setSelectedStudent,
   data,
+  className
 }: {
   selectedStudent: string;
   setSelectedStudent: React.Dispatch<React.SetStateAction<string>>;
   data: any;
+  className?: string;
 }) {
-  const [input, setInput] = useState<string | undefined>('');
   const SearchAction = async (formData: FormData) => {
     const id = formData.get('studentId') || '';
-    if (id) setInput(id.toString().toUpperCase());
     setSelectedStudent(id.toString().toUpperCase());
     console.log({ selectedStudent });
   };
 
-  console.log(data);
+  const schoolLevel = useSchoolLevel();
 
   return (
-    <Card className="w-full bg-neutral-100 pb-1" shadow="md">
+    <Card className={`${className} bg-neutral-100 pb-1 max-h-64 overflow-hidden`} shadow="md">
       <CardHeader className={nunito.className}>
         <h3 className="text-lg font-medium text-slate-800">
           Currently viewing student{' '}
@@ -209,21 +220,21 @@ export default function StudentSearch({
         &nbsp;
         <span className="font-extrabold underline">{selectedStudent}</span>
       </CardHeader>
-      <CardBody className={`${nunito.className} -mt-4 flex w-full flex-row`}>
+      <CardBody className={`${nunito.className} -mt-4 flex w-full flex-row overflow-hidden`}>
         <div className="flex w-max basis-full flex-col gap-1">
           <form className="flex w-full flex-row" action={SearchAction}>
             <div className="flex w-full">
-              <Input
-                name="studentId"
-                placeholder="Enter student ID"
-                variant="underlined"
-              />
+              <StudentAutocomplete options={schoolLevel.listOfAllStudents.map((value: any, index: number) => (value.studentid))} name={'studentId'} />
+
               <Button className="min-w-fit" variant="flat" type="submit">
                 <SimpleLineIconsMagnifier />
               </Button>
             </div>
           </form>
-          {!data && input && <FormError message="Student is not existed!" />}
+
+          {!data && data !== '' && (
+            <FormError message="Student does not exist" />
+          )}
 
           <DemographicsRow
             content={{

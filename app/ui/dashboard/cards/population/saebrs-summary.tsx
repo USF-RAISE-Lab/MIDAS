@@ -8,19 +8,18 @@ const nunito = Nunito({
   style: ['normal', 'italic'],
 });
 
+
+const subtitles = ['Low', 'Some', 'High']
+
 function Interior({
   title,
   values,
-  subtitles,
-  padding,
 }: {
   title: string;
   values: [string | number, string | number, string | number];
-  subtitles: [string, string, string];
-  padding: string;
 }) {
   return (
-    <div className={'mx-2 flex h-20 flex-col rounded-xl' + padding}>
+    <div className={'mx-2 flex h-20 flex-col rounded-xl'}>
       {/* CONTENT ROW */}
       <p className={` text-md ml-2`}> {title} </p>
       <div className="-mx-2 flex flex-row px-8">
@@ -87,16 +86,12 @@ function Interior({
 
 export function SaebrsSummary({
   title,
-  subtitlesTop,
-  subtitlesBottom,
-  valuesTop,
-  valuesBottom,
+  saebrsValues,
+  mySaebrsValues,
 }: {
   title: string;
-  subtitlesTop: [string, string, string];
-  subtitlesBottom: [string, string, string];
-  valuesTop: [string, string, string] | [number, number, number];
-  valuesBottom: [string, string, string] | [number, number, number];
+  saebrsValues: [string, string, string] | [number, number, number];
+  mySaebrsValues: [string, string, string] | [number, number, number];
 }) {
   return (
     <Card
@@ -109,28 +104,22 @@ export function SaebrsSummary({
 
       {/* MAIN CONTENT */}
       <div className="flex flex-col">
-        {/* CARD 1 --- ODR */}
         <Tooltip content={'Saebrs Tooltip'} placement="bottom">
           <div>
             <Interior
               title="SAEBRS"
-              values={valuesTop}
-              subtitles={subtitlesTop}
-              padding=""
+              values={saebrsValues}
             />
           </div>
         </Tooltip>
 
         <Divider className="mb-1 mt-0" />
 
-        {/* CARD 2 --- SUSPENSIONS */}
         <Tooltip content={'MySaebrs Tooltip'} placement="bottom">
           <div>
             <Interior
               title="mySAEBRS"
-              values={valuesBottom}
-              subtitles={subtitlesBottom}
-              padding=""
+              values={mySaebrsValues}
             />
           </div>
         </Tooltip>

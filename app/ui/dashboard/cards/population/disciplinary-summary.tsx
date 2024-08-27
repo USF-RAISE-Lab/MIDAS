@@ -84,7 +84,7 @@ export function CardDisciplinarySummary({
       className={`${nunito.className} items-center rounded-xl bg-neutral-100 pb-2`}
     >
       {/* MAIN TITLE */}
-      <CardHeader className="">
+      <CardHeader>
         <h3 className="text-lg font-medium text-slate-800">{title}</h3>
       </CardHeader>
 

@@ -140,11 +140,12 @@ const FileModal = () => {
 
       let file1: File = values.document1?.[0];
 
-      if ((await CompareSchoolNames(file1)) == false) {
-        toast.error('You are not permitted to open this file');
-        // throw(new Error("User is not permitted to open this file."))
-        return;
-      }
+      // For checking file name - not good security
+      // if ((await CompareSchoolNames(file1)) == false) {
+      //   toast.error('You are not permitted to open this file');
+      //   // throw(new Error("User is not permitted to open this file."))
+      //   return;
+      // }
 
       if (!file1) {
         toast.error('Missing fields');
@@ -226,31 +227,31 @@ const FileModal = () => {
       // );
 
       //mysaeber Emotion Risk
-      schooLevel.setMySaebrsEmotion(
+      schooLevel.setMySaebrsEmotional(
         getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_emo', 'MySaebrs'),
       );
 
       //saeber Emotion Risk
-      schooLevel.setSaebrsEmotion(
+      schooLevel.setSaebrsEmotional(
         getmyRiskStatsSchoolLevel(uploadData, 'saebrs_emo', 'Saebrs'),
       );
 
       //Saeber Academic Risk
-      schooLevel.setMySaeberAcademic(
+      schooLevel.setMySaebrsAcademic(
         getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_aca', 'MySaebrs'),
       );
 
       //Mysaeber Academic Risk
-      schooLevel.setSaeberAcademic(
+      schooLevel.setSaebrsAcademic(
         getmyRiskStatsSchoolLevel(uploadData, 'saebrs_aca', 'Saebrs'),
       );
 
       //Saeber Social Risk
-      schooLevel.setSaeberSocial(
+      schooLevel.setSaebrsSocial(
         getmyRiskStatsSchoolLevel(uploadData, 'saebrs_soc', 'Saebrs'),
       );
       //Mysaeber Social Risk
-      schooLevel.setMySaeberSocial(
+      schooLevel.setMySaebrsSocial(
         getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_soc', 'MySaebrs'),
       );
 
@@ -282,32 +283,32 @@ const FileModal = () => {
       // schooLevel.setEthnicityRisk(getDemographic(suspRisk, 'ethnicity'));
 
       //mysaeber Emotion Risk
-      gradeLevel.setMySaebrsEmotion(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mysaebrs_emo'),
+      gradeLevel.setMySaebrsEmotional(
+        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsEmotional'),
       );
 
       //saeber Emotion Risk
-      gradeLevel.setSaebrsEmotion(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrs_emo'),
+      gradeLevel.setSaebrsEmotional(
+        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsEmotional'),
       );
 
       //MySaeber Academic Risk
-      gradeLevel.setMySaeberAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mysaebrs_aca'),
+      gradeLevel.setMySaebrsAcademic(
+        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsAcademic'),
       );
 
       //Saeber Academic Risk
-      gradeLevel.setSaeberAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrs_aca'),
+      gradeLevel.setSaebrsAcademic(
+        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsAcademic'),
       );
 
       //Mysaeber Social Risk
-      gradeLevel.setMySaeberSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mysaebrs_soc'),
+      gradeLevel.setMySaebrsSocial(
+        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsSocial'),
       );
       //saeber Social Risk
-      gradeLevel.setSaeberSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrs_soc'),
+      gradeLevel.setSaebrsSocial(
+        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsSocial'),
       );
 
       // gradeLevel.setRiskMath(
@@ -345,32 +346,32 @@ const FileModal = () => {
       //classroom
 
       //mysaeber Emotion Risk
-      classLevel.setMySaebrsEmotion(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mysaebrs_emo'),
+      classLevel.setMySaebrsEmotional(
+        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsEmotional'),
       );
 
       //saeber Emotion Risk
-      classLevel.setSaebrsEmotion(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrs_emo'),
+      classLevel.setSaebrsEmotional(
+        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsEmotional'),
       );
 
       //MySaeber Academic Risk
-      classLevel.setMySaeberAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mysaebrs_aca'),
+      classLevel.setMySaebrsAcademic(
+        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsAcademic'),
       );
 
       //Saeber Academic Risk
-      classLevel.setSaeberAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrs_aca'),
+      classLevel.setSaebrsAcademic(
+        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsAcademic'),
       );
 
       //Mysaeber Social Risk
-      classLevel.setMySaeberSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mysaebrs_soc'),
+      classLevel.setMySaebrsSocial(
+        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsSocial'),
       );
       //saeber Social Risk
-      classLevel.setSaeberSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrs_soc'),
+      classLevel.setSaebrsSocial(
+        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsSocial'),
       );
 
       // classLevel.setRiskMath(
@@ -411,7 +412,7 @@ const FileModal = () => {
       reset();
       fileModal.onClose();
     } catch (error) {
-      toast.error('Somthing went wrong');
+      toast.error('Somthing went wrong.');
     } finally {
       setIsLoading(false);
     }

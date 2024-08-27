@@ -11,25 +11,33 @@ import clsx from 'clsx';
 import SupportModal from '../modals/tech-support';
 
 export default function SideNav() {
-  const {isOpen: isOpenSignout, onOpen: onOpenSignout, onOpenChange: onOpenChangeSignout} = useDisclosure();
-  const {isOpen: isOpenSupport, onOpen: onOpenSupport, onOpenChange: onOpenChangeSupport} = useDisclosure();
-  
-  const [ collapsed, setCollapsed] = useState(false);
-  
+  const { isOpen: isOpenSignout, onOpen: onOpenSignout, onOpenChange: onOpenChangeSignout } = useDisclosure();
+  const { isOpen: isOpenSupport, onOpen: onOpenSupport, onOpenChange: onOpenChangeSupport } = useDisclosure();
+
+  const [collapsed, setCollapsed] = useState(false);
+
   const arrows = {
-    'left' : <>&larr;</>,
+    'left': <>&larr;</>,
     'right': <>&rarr;</>
   }
 
+  const handleHoverStart = () => {
+    setCollapsed(false);
+  }
+
+  const handleHoverEnd = () => {
+    setCollapsed(true);
+  }
+
   return (
-    <div className={clsx("flex h-full flex-col px-3 py-4 md:px-2 max-sm:w-fit",
+    <div className={clsx("flex sm:h-full flex-col px-3 py-4 md:px-2 max-sm:w-fit bg-zinc-50 sm:transition-all sm:duration-100 rounded-md shadow-md",
       {
-        'w-16' : collapsed,
-        'w-48' : !collapsed
+        'w-16': collapsed,
+        'w-40': !collapsed
       },
-    )}>
-      <ConfirmSignoutModal isOpen={isOpenSignout} onOpen={onOpenSignout} onOpenChange={onOpenChangeSignout}/>
-      <SupportModal isOpen={isOpenSupport} onOpen={onOpenSupport} onOpenChange={onOpenChangeSupport}/>
+    )} onMouseEnter={handleHoverStart} onMouseLeave={handleHoverEnd}>
+      <ConfirmSignoutModal isOpen={isOpenSignout} onOpen={onOpenSignout} onOpenChange={onOpenChangeSignout} />
+      <SupportModal isOpen={isOpenSupport} onOpen={onOpenSupport} onOpenChange={onOpenChangeSupport} />
       <div
         className="mb-2 flex h-20 items-center justify-center rounded-md bg-gray-50 max-md:hidden md:h-24"
       >
@@ -37,23 +45,49 @@ export default function SideNav() {
           <MidasLogoNoText />
         </div>
       </div>
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 max-sm:w-fit">
-        <NavLinks collapsed={collapsed}/>
+      <div className="flex flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 max-sm:w-fit">
+        <NavLinks collapsed={collapsed} />
 
-        <button onClick={onOpenSupport} className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-green-100 hover:text-green-600 md:flex-none md:justify-start md:p-2 md:px-2">
-          <QuestionMarkCircleIcon className="w-8" />
-          {!collapsed ? <div className="hidden md:block">Support</div> : <></>}
-        </button>
+        {/* <div className="hidden h-full w-full grow rounded-md bg-gray-50 md:block"></div> */}
 
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
-          <button className='bg-gray-50 rounded-md max-md:hidden' onClick={() => setCollapsed(!collapsed)}>
-            {!collapsed ? <p className='text-3xl'>{arrows.left}</p> : <p className='text-3xl'>{arrows.right}</p>}
+        <div className='flex flex-col mt-auto mb-0'>
+          <button
+            onClick={onOpenSupport}
+            className='sidenav-navlink-button'
+          >
+            < QuestionMarkCircleIcon className='sidenav-navlink-icon' />
+            <div
+              className={clsx(
+                'hidden md:block transition-opacity duration-100 ease-in-out ml-auto mr-0',
+                {
+                  'opacity-0': collapsed,
+                  'opacity-100 delay-100': !collapsed, // Delay text appearance to match background transition
+                }
+              )}
+            >
+                Support
+              </div>
           </button>
 
-          <button onClick={onOpenSignout} className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-green-100 hover:text-green-600 md:flex-none md:justify-start md:p-2 md:px-2">
-            <PowerIcon className="w-8" />
-            {!collapsed ? <div className="hidden md:block">Sign Out</div> : <></>}
+          <button
+            onClick={onOpenSignout}
+            className='sidenav-navlink-button'
+          >
+            <PowerIcon className='sidenav-navlink-icon' />
+            <div
+              className={clsx(
+                'hidden md:block transition-opacity duration-100 ease-in-out ml-auto mr-0',
+                {
+                  'opacity-0': collapsed,
+                  'opacity-100 delay-100': !collapsed, // Delay text appearance to match background transition
+                }
+              )}
+            >
+              Signout
+            </div>
           </button>
+        </div>
+        
       </div>
     </div>
   );

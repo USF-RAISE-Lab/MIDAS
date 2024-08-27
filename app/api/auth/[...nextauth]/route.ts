@@ -50,9 +50,9 @@ const handler = NextAuth({
         })
 
         if (error) {
-          // console.error("JWT callback - error:", error);
+          console.error("JWT callback - error:", error);
         } else {
-          // console.log("JWT callback - user data:", data);
+          console.log("JWT callback - user data:", data);
 
           (token as CustomToken).username = data.name;
           (token as CustomToken).is_admin = data.is_admin;

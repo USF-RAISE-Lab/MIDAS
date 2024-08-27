@@ -1,70 +1,87 @@
-import { read } from 'fs';
 import { create } from 'zustand';
 
 interface SchoolLevelStore {
   listOfAllStudents: any;
-  confidenceLevel: any;
-  saebrsEmotion: any;
-  mySaebrsEmotion: any;
-  saeberAcademic: any;
-  mySaeberAcademic: any;
-  saeberSocial: any;
-  mySaeberSocial: any;
-  riskMath: any;
-  riskReading: any;
-  riskSuspension: any;
-  genderRisk: any;
-  ethnicityRisk: any;
-  ellRisk: any;
-  riskODR: any;
-  setSaebrsEmotion: (emo: any) => void;
-  setMySaebrsEmotion: (emo: any) => void;
-  setSaeberAcademic: (academic: any) => void;
-  setMySaeberAcademic: (academic: any) => void;
-  setSaeberSocial: (social: any) => void;
-  setMySaeberSocial: (social: any) => void;
-  setRiskMath: (math: any) => void;
-  setRiskReading: (reading: any) => void;
-  setRiskSuspension: (susp: any) => void;
-  setRiskODR: (odr: any) => void;
-  setConfidenceLevel: (confidence: any) => void;
+  confidenceLevel: number;
+
+  saebrsEmotional: any;
+  mySaebrsEmotional: any;
+  saebrsAcademic: any;
+  mySaebrsAcademic: any;
+  saebrsSocial: any;
+  mySaebrsSocial: any;
+
+  riskMath: string;
+  riskReading: string;
+
+  riskODR: string;
+  riskSuspension: string;
+
+  genderRisk: string;
+  ethnicityRisk: string;
+  ellRisk: string;
+  
+  setConfidenceLevel: (confidence: number) => void;
   setlistOfAllStudents: (students: any) => void;
-  setGenderRisk: (gender: any) => void;
-  setEthnicityRisk: (ethnicity: any) => void;
-  setEllRisk: (ell: any) => void;
+
+  setSaebrsEmotional: (emo: JSON) => void;
+  setMySaebrsEmotional: (emo: JSON) => void;
+  setSaebrsAcademic: (academic: JSON) => void;
+  setMySaebrsAcademic: (academic: JSON) => void;
+  setSaebrsSocial: (social: JSON) => void;
+  setMySaebrsSocial: (social: JSON) => void;
+
+  setRiskMath: (math: string) => void;
+  setRiskReading: (reading: string) => void;
+
+  setRiskSuspension: (susp: string) => void;
+  setRiskODR: (odr: string) => void;
+
+  setGenderRisk: (gender: string) => void;
+  setEthnicityRisk: (ethnicity: string) => void;
+  setEllRisk: (ell: string) => void;
 }
 
 const useSchoolLevel = create<SchoolLevelStore>((set: any) => ({
-  riskODR: '',
-  genderRisk: '',
   listOfAllStudents: undefined,
   confidenceLevel: 0,
+
+  saebrsEmotional: '',
+  mySaebrsEmotional: '',
+  saebrsAcademic: '',
+  mySaebrsAcademic: '',
+  saebrsSocial: '',
+  mySaebrsSocial: '',
+
   riskMath: '',
   riskReading: '',
+
+  riskODR: '',
   riskSuspension: '',
-  saebrsEmotion: '',
-  mySaebrsEmotion: '',
-  saeberAcademic: '',
-  mySaeberAcademic: '',
-  saeberSocial: '',
-  mySaeberSocial: '',
+
+  genderRisk: '',
   ethnicityRisk: '',
   ellRisk: '',
-  setSaebrsEmotion: (emo: JSON) => set({ saebrsEmotion: emo }),
-  setMySaebrsEmotion: (emo: JSON) => set({ mySaebrsEmotion: emo }),
-  setSaeberAcademic: (academic: JSON) => set({ saeberAcademic: academic }),
-  setMySaeberAcademic: (academic: JSON) => set({ mySaeberAcademic: academic }),
-  setSaeberSocial: (social: JSON) => set({ saeberSocial: social }),
-  setMySaeberSocial: (social: JSON) => set({ mySaeberSocial: social }),
-  setRiskMath: (math: any) => set({ riskMath: math }),
-  setRiskReading: (reading: any) => set({ riskReading: reading }),
-  setRiskSuspension: (susp: any) => set({ riskSuspension: susp }),
-  setConfidenceLevel: (confidence: any) => set({ confidenceLevel: confidence }),
+
+  setConfidenceLevel: (confidence: number) => set({ confidenceLevel: confidence }),
   setlistOfAllStudents: (students: any) => set({ listOfAllStudents: students }),
-  setGenderRisk: (gender: any) => set({ genderRisk: gender }),
-  setEthnicityRisk: (ethnicity: any) => set({ ethnicityRisk: ethnicity }),
-  setEllRisk: (ell: any) => set({ ellRisk: ell }),
-  setRiskODR: (odr: any) => set({ riskODR: odr }),
+
+  setSaebrsEmotional: (emo: JSON) => set({ saebrsEmotional: emo }),
+  setMySaebrsEmotional: (emo: JSON) => set({ mySaebrsEmotional: emo }),
+  setSaebrsAcademic: (academic: JSON) => set({ saebrsAcademic: academic }),
+  setMySaebrsAcademic: (academic: JSON) => set({ mySaebrsAcademic: academic }),
+  setSaebrsSocial: (social: JSON) => set({ saebrsSocial: social }),
+  setMySaebrsSocial: (social: JSON) => set({ mySaebrsSocial: social }),
+
+  setRiskMath: (math: string) => set({ riskMath: math }),
+  setRiskReading: (reading: string) => set({ riskReading: reading }),
+
+  setRiskODR: (odr: string) => set({ riskODR: odr }),
+  setRiskSuspension: (susp: string) => set({ riskSuspension: susp }),
+
+  setGenderRisk: (gender: string) => set({ genderRisk: gender }),
+  setEthnicityRisk: (ethnicity: string) => set({ ethnicityRisk: ethnicity }),
+  setEllRisk: (ell: string) => set({ ellRisk: ell }),
 }));
 
 export default useSchoolLevel;

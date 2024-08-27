@@ -149,64 +149,75 @@ export default function Page({ searchParams }: SearchProps) {
     });
   };
   return (
-    <main className={`${nunito.className}`}>
-      <div className="flex flex-col gap-4">
-        {/* Top row */}
-        <div className="flex w-full flex-row gap-8">
-          <div className={`${nunito.className} flex w-full basis-1/3`}>
-            <StudentSearch
-              selectedStudent={selectedStudent}
-              setSelectedStudent={setSelectedStudent}
-              data={data}
-            />
-          </div>
+    <main className='flex flex-col gap-2 m-2'>
+      <div className='flex flex-col lg:flex-row gap-1'>
+        <StudentSearch
+          selectedStudent={selectedStudent}
+          setSelectedStudent={setSelectedStudent}
+          data={data}
+          className='lg:basis-1/3'
+        />
 
-          <div className="flex w-full basis-1/3">
-            <CardStudentDiscipline
-              odr={testScoreRisk.odr}
-              suspensions={testScoreRisk.suspension}
-            />
-          </div>
-
-          <div className="flex w-full basis-1/3">
-            <CardStudentTestScores
-              math={testScoreRisk.math}
-              reading={testScoreRisk.reading}
-            />
-          </div>
+        <div className='flex lg:hidden flex-row gap-1'>
+          <CardMidasRisk 
+            midasRisk={midasSummary.midasRisk} 
+            className='basis-1/2'
+          />
+          <CardConfidenceVisualizer
+            confidence={3}
+            confidenceThresholds={[1, 2, 3, 4, 5]}
+            missingVariables={0}
+            className='basis-1/2 '
+          />
         </div>
 
-        {/* Second row */}
-        <div className="flex w-full flex-row gap-4">
-          <div className="flex basis-1/5 flex-col gap-2">
-            <CardMidasRisk midasRisk={midasSummary.midasRisk} />
-            <CardConfidenceVisualizer
-              confidence={3}
-              confidenceThresholds={[1, 2, 3, 4, 5]}
-              missingVariables={0}
-            />
-          </div>
-
-          <div className="flex w-max basis-4/5 flex-row">
-            <SaebrsSummary
-              saebrsTotal={saebrsScores.saebrsTotal}
-              mySaebrsTotal={saebrsScores.mySaebrsTotal}
-              saebrsEmotional={saebrsScores.saebrsEmotional}
-              mySaebrsEmotional={saebrsScores.mySaebrsEmotional}
-              saebrsSocial={saebrsScores.saebrsSocial}
-              mySaebrsSocial={saebrsScores.mySaebrsSocial}
-              saebrsAcademic={saebrsScores.saebrsAcademic}
-              mySaebrsAcademic={saebrsScores.mySaebrsAcademic}
-            />
-          </div>
+        <div className='flex flex-col lg:flex-row gap-1 lg:basis-2/3'>
+          <CardStudentDiscipline
+            odr={testScoreRisk.odr}
+            suspensions={testScoreRisk.suspension}
+          />
+          <CardStudentTestScores
+            math={testScoreRisk.math}
+            reading={testScoreRisk.reading}
+          />
         </div>
       </div>
+      
+      
 
-      <div className="z-5 absolute bottom-10 right-28 opacity-75">
-        <Button
-          className="bg-[#1e8434] hover:bg-[#1e8434a1]"
-          onClick={() => handleExport(schoolLevel?.listOfAllStudents)}
-        >
+      <div className='flex flex-row gap-1 h-[29vh]'>
+        <div className='hidden lg:flex flex-col gap-1 basis-1/4 '>
+          <CardMidasRisk 
+            midasRisk={midasSummary.midasRisk} 
+            className='h-full'
+          />
+          <CardConfidenceVisualizer
+            confidence={3}
+            confidenceThresholds={[1, 2, 3, 4, 5]}
+            missingVariables={0}
+            className=''
+          />
+        </div>
+
+        <div className='lg:basis-3/4 w-full'>
+          <SaebrsSummary
+            saebrsTotal={saebrsScores.saebrsTotal}
+            mySaebrsTotal={saebrsScores.mySaebrsTotal}
+            saebrsEmotional={saebrsScores.saebrsEmotional}
+            mySaebrsEmotional={saebrsScores.mySaebrsEmotional}
+            saebrsSocial={saebrsScores.saebrsSocial}
+            mySaebrsSocial={saebrsScores.mySaebrsSocial}
+            saebrsAcademic={saebrsScores.saebrsAcademic}
+            mySaebrsAcademic={saebrsScores.mySaebrsAcademic}
+            className='gap-1 h-full'
+            className_card='min-h-[28vh]'
+          />
+        </div>
+        
+      </div>
+
+      <div className="invisible lg:visible z-10 absolute bottom-10 right-28 opacity-75">
+        <Button className="bg-[#1e8434] hover:bg-[#1e8434a1]" onClick={() => handleExport(schoolLevel?.listOfAllStudents)}>
           <ArrowDownTrayIcon className="w-6 pr-2" />
           <p>Export</p>
         </Button>

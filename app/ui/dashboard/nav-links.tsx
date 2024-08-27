@@ -20,6 +20,7 @@ import {
 } from '@/app/context/nav-search-context';
 import useFileModal from '@/hooks/useFileModal';
 import { useDebouncedCallback } from 'use-debounce';
+import React from 'react';
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
@@ -104,10 +105,7 @@ const NavSearchBox: React.FC<{ href: string }> = ({ href }) => {
   return null;
 };
 
-export default function NavLinks({ collapsed }: { collapsed: boolean }) {
-  const [selectedSchool, setSelectedSchool] = useState<string>('');
-  const value = { selectedSchool, setSelectedSchool };
-
+function NavLinks({ collapsed }: { collapsed: boolean }) {
   const pathname = usePathname();
   const fileModal = useFileModal();
 
@@ -115,52 +113,62 @@ export default function NavLinks({ collapsed }: { collapsed: boolean }) {
     <>
       {links.map((link) => {
         const LinkIcon = link.icon;
-        if (link.href) {
-          return (
-            <div key={link.name}>
-              <Link
-                key={link.name}
-                href={link.href}
-                className={clsx(
-                  'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-green-100 hover:text-green-600 md:flex-none md:justify-start md:p-2 md:px-3',
-                  {
-                    'bg-green-100 text-green-600': pathname === link.href,
-                  },
-                )}
-              >
-                {/* <LinkIcon className={clsx({'w-6' : !collapsed, 'w-9' : collapsed})}/> */}
-                <LinkIcon className="w-6"></LinkIcon>
-                {!collapsed ? (
-                  <p className="hidden md:block">{link.name}</p>
-                ) : (
-                  <></>
-                )}
-              </Link>
-              {!collapsed ? <NavSearchBox href={link.href} /> : null}
-            </div>
-          );
-        } else {
-          return (
-            <button
-              key={link.name}
-              onClick={fileModal.onOpen}
+        const isActive = pathname === link.href;
+
+        return link.href ? (
+          <div key={link.name}>
+            <Link
+              href={link.href}
               className={clsx(
-                'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-green-100 hover:text-green-600 md:flex-none md:justify-start md:p-2 md:px-3',
-                {
-                  'bg-green-100 text-green-600': pathname === link.href,
-                },
+                'sidenav-navlink-button',
+                { 'bg-green-100 text-green-600': isActive }
               )}
             >
-              <LinkIcon className="w-6" />
-              {!collapsed ? (
-                <p className="hidden md:block">{link.name}</p>
-              ) : (
-                <></>
-              )}
-            </button>
-          );
-        }
+              <LinkIcon className='sidenav-navlink-icon'/>
+              
+              <div
+                className={clsx(
+                  'hidden md:block transition-opacity duration-100 ease-in-out ml-auto mr-0',
+                  {
+                    'opacity-0': collapsed,
+                    'opacity-100 delay-100': !collapsed, // Delay text appearance to match background transition
+                  }
+                )}
+              >
+                {!collapsed && link.name}
+              </div>
+            </Link>
+          </div>
+        ) : (
+          <button
+            key={link.name}
+            onClick={fileModal.onOpen}
+            className={clsx(
+              'sidenav-navlink-button',
+              { 'bg-green-100 text-green-600': isActive }
+            )}
+          >
+            <LinkIcon className='sidenav-navlink-icon' />
+            <div
+                className={clsx(
+                  'hidden md:block transition-opacity duration-100 ease-in-out ml-auto mr-0',
+                  {
+                    'opacity-0': collapsed,
+                    'opacity-100 delay-100': !collapsed, // Delay text appearance to match background transition
+                  }
+                )}
+              >
+              {!collapsed && link.name}
+            </div>
+          </button>
+        );
       })}
     </>
   );
 }
+
+// export default NavLinks;
+
+const MemoizedNavLinks = React.memo(NavLinks);
+
+export default MemoizedNavLinks

@@ -124,7 +124,7 @@ export function CardThreeValue({
       <div onClick={TooltipOnOpen}>
       <Tooltip content="Click to see more information about the MIDAS risk score" placement='bottom' className="">
         <Card className=" bg-neutral-100" shadow='md' >
-          <CardHeader className={nunito.className}>
+          <CardHeader className={`${nunito.className}`}>
             <h3 className="text-lg font-medium text-slate-800">{title}</h3>
           </CardHeader>
           <CardBody className=''>

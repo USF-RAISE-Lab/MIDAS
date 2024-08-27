@@ -1,42 +1,31 @@
 import { ResponsivePie } from '@nivo/pie';
+import { Doughnut } from 'react-chartjs-2';
+import { RiskLevelCategory } from './risk-level-category-type';
+import { Chart, registerables } from 'chart.js';
+import { donutOptions } from './donut-config';
+import { DemographicsType } from './demographics-type';
+
+Chart.register(...registerables);
 
 export function DonutChart({
   data,
-  colors,
-  selectedSlice,
+  colors
 }: {
-  data: { id: string; value: number }[];
-  colors: string[];
-  selectedSlice?: string;
+  data: DemographicsType[],
+  colors: string[]
 }) {
-  if (selectedSlice === 'Yes') {
-    selectedSlice = 'ELL';
-  } else if (selectedSlice === 'No') {
-    selectedSlice = 'Not ELL';
-  }
+
+  const formattedData = {
+    labels: data.map(demographic => demographic.label),
+    datasets: [{
+      label: 'Demographics',
+      data: data.map(d => d.value),
+      backgroundColor: colors
+    }]
+  };
+  
 
   return (
-    <ResponsivePie
-      data={data}
-      margin={{ top: 0, right: 90, bottom: 0, left: 110 }}
-      innerRadius={0.6}
-      padAngle={0.7}
-      cornerRadius={3}
-      activeOuterRadiusOffset={18} // This expands the active slice
-      colors={({ id }) => {
-        const index = data.findIndex((d) => d.id === id);
-        return colors[index % colors.length];
-      }}
-      borderWidth={1}
-      borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-      arcLinkLabelsTextColor="#333333"
-      arcLinkLabelsThickness={2}
-      arcLinkLabelsColor={{ from: 'color' }}
-      arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
-      activeId={selectedSlice}
-      onClick={(node, event) => {
-        console.log(node);
-      }}
-    />
-  );
+    <Doughnut data={formattedData} options={donutOptions}/> 
+  )
 }

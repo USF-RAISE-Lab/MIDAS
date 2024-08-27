@@ -9,18 +9,20 @@ import useGradeLevel from '@/hooks/useGradeLevel';
 import { useSearchContext } from '@/app/context/nav-search-context';
 import useRiskOptions from '@/hooks/useRiskOptions';
 import { Card } from '@nextui-org/react';
-import { BarChart } from '@/app/ui/charts/BarChart';
 import { ethnicity, genders, ell } from '@/constants/constants';
 import GradeSearchInputOnly from '@/app/ui/dashboard/cards/search/grade-search-input';
 import GradeSearch from '@/app/ui/dashboard/cards/search/grade-search-card';
 import useSchoolLevel from '@/hooks/useSchoolLevel';
+import MyBarChart from '@/app/ui/charts/bar-chart';
+import { getGradeRiskValues, getSchoolRiskValues } from '@/app/lib/get-risk-values';
+import { ChartGroup } from '@/app/ui/charts/chart-group';
 function MidasRiskTooltipContent() {
   return (
     <div>Percentages of students at the three different MIDAS risk levels.</div>
   );
 }
 
-export default async function Page() {
+export default function Page() {
   const [genderState, setGenderState] = useState({
     math_risk: false,
     read_risk: false,
@@ -39,8 +41,8 @@ export default async function Page() {
   });
   const riskOptions = useRiskOptions();
   const gradeLevel = useGradeLevel();
+  console.log(gradeLevel)
   const grade = useSearchContext('grade');
-  grade.set;
   const selectedGrade = grade.get;
 
   const [midasRisk, setMidasRisk] = useState({
@@ -79,8 +81,6 @@ export default async function Page() {
     return undefined;
   };
 
-  const colors = ['rose-500', 'yellow-400', 'green-500'];
-
   // Stops proceeding to dashboard before uploading data
   const schoolLevel = useSchoolLevel();
   if (schoolLevel.listOfAllStudents === undefined) {
@@ -100,7 +100,7 @@ export default async function Page() {
           <GradeSearchInputOnly
             selectedGrade={selectedGrade}
             setSelectedGrade={grade.set}
-            gradeList={Object.keys(gradeLevel.mySaeberAcademic).map(
+            gradeList={Object.keys(gradeLevel.mySaebrsAcademic).map(
               (grade) => grade,
             )}
           />
@@ -109,7 +109,7 @@ export default async function Page() {
     );
   }
 
-  if (gradeLevel.mySaeberAcademic[selectedGrade] === undefined) {
+  if (gradeLevel.mySaebrsAcademic[selectedGrade] === undefined) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <div>
@@ -124,12 +124,12 @@ export default async function Page() {
     <main>
       <div className="flex h-full gap-4">
         {/* LEFT COL */}
-        <div className="mb-4 flex basis-1/4 flex-col">
+        <div className="mb-4 flex basis-1/5 flex-col">
           <div className="flex flex-col gap-3 ">
             <GradeSearch
               selectedGrade={selectedGrade}
               setSelectedGrade={grade.set}
-              gradeList={Object.keys(gradeLevel.mySaeberAcademic).map(
+              gradeList={Object.keys(gradeLevel.mySaebrsAcademic).map(
                 (grade) => grade,
               )}
               classList={['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}
@@ -178,215 +178,39 @@ export default async function Page() {
           </div>
         </div>
 
-        <div className="h-full w-full basis-3/4 flex-col">
-          <div className="flex w-full flex-row gap-3">
+        <div className="h-full w-full basis-4/5 flex-col">
+          <div className="-mb-8 flex w-full flex-row gap-3">
             <div className="basis-1/4">
               <SaebrsSummary
                 title={'Total'}
-                valuesTop={['N/A', 'N/A', 'N/A']}
-                subtitlesTop={['Low', 'Some', 'High']}
-                valuesBottom={['N/A', 'N/A', 'N/A']}
-                subtitlesBottom={['Low', 'Some', 'High']}
+                saebrsValues={['N/A', 'N/A', 'N/A']}
+                mySaebrsValues={['N/A', 'N/A', 'N/A']}
               />
             </div>
             <div className="basis-1/4">
               <SaebrsSummary
                 title={'Social'}
-                valuesTop={[
-                  gradeLevel
-                    ? gradeLevel.saeberSocial[selectedGrade]['saebrs_soc'][
-                        'Low Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.saeberSocial[selectedGrade]['saebrs_soc'][
-                        'Some Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.saeberSocial[selectedGrade]['saebrs_soc'][
-                        'High Risk'
-                      ] + '%'
-                    : '0%',
-                ]}
-                subtitlesTop={['Low', 'Some', 'High']}
-                valuesBottom={[
-                  gradeLevel
-                    ? gradeLevel.mySaebrsEmotion[selectedGrade]['mysaebrs_emo'][
-                        'Low Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.mySaebrsEmotion[selectedGrade]['mysaebrs_emo'][
-                        'Some Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.mySaebrsEmotion[selectedGrade]['mysaebrs_emo'][
-                        'High Risk'
-                      ] + '%'
-                    : '0%',
-                ]}
-                subtitlesBottom={['Low', 'Some', 'High']}
+                saebrsValues={getGradeRiskValues(gradeLevel, selectedGrade, 'saebrsSocial')}
+                mySaebrsValues={getGradeRiskValues(gradeLevel, selectedGrade, 'mySaebrsSocial')}
               />
             </div>
             <div className="basis-1/4">
               <SaebrsSummary
                 title={'Academic'}
-                valuesTop={[
-                  gradeLevel
-                    ? gradeLevel.saeberAcademic[selectedGrade]['saebrs_aca'][
-                        'Low Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.saeberAcademic[selectedGrade]['saebrs_aca'][
-                        'Some Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.saeberAcademic[selectedGrade]['saebrs_aca'][
-                        'High Risk'
-                      ] + '%'
-                    : '0%',
-                ]}
-                subtitlesTop={['Low', 'Some', 'High']}
-                valuesBottom={[
-                  gradeLevel
-                    ? gradeLevel.mySaeberAcademic[selectedGrade][
-                        'mysaebrs_aca'
-                      ]['Low Risk'] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.mySaeberAcademic[selectedGrade][
-                        'mysaebrs_aca'
-                      ]['Some Risk'] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.mySaeberAcademic[selectedGrade][
-                        'mysaebrs_aca'
-                      ]['High Risk'] + '%'
-                    : '0%',
-                ]}
-                subtitlesBottom={['Low', 'Some', 'High']}
+                saebrsValues={getGradeRiskValues(gradeLevel, selectedGrade, 'saebrsAcademic')}
+                mySaebrsValues={getGradeRiskValues(gradeLevel, selectedGrade, 'mySaebrsAcademic')}
               />
             </div>
             <div className="basis-1/4">
               <SaebrsSummary
                 title={'Emotional'}
-                valuesTop={[
-                  gradeLevel
-                    ? gradeLevel.saebrsEmotion[selectedGrade]['saebrs_emo'][
-                        'Low Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.saebrsEmotion[selectedGrade]['saebrs_emo'][
-                        'Some Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.saebrsEmotion[selectedGrade]['saebrs_emo'][
-                        'High Risk'
-                      ] + '%'
-                    : '0%',
-                ]}
-                subtitlesTop={['Low', 'Some', 'High']}
-                valuesBottom={[
-                  gradeLevel
-                    ? gradeLevel.mySaebrsEmotion[selectedGrade]['mysaebrs_emo'][
-                        'Low Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.mySaebrsEmotion[selectedGrade]['mysaebrs_emo'][
-                        'Some Risk'
-                      ] + '%'
-                    : '0%',
-                  gradeLevel
-                    ? gradeLevel.mySaebrsEmotion[selectedGrade]['mysaebrs_emo'][
-                        'High Risk'
-                      ] + '%'
-                    : '0%',
-                ]}
-                subtitlesBottom={['Low', 'Some', 'High']}
+                saebrsValues={getGradeRiskValues(gradeLevel, selectedGrade, 'saebrsEmotional')}
+                mySaebrsValues={getGradeRiskValues(gradeLevel, selectedGrade, 'mySaebrsEmotional')}
               />
             </div>
           </div>
 
-          <div className="mt-16 flex flex-row justify-between gap-2">
-            <Card
-              className="-mt-12 flex h-[68vh] w-[550px] rounded-xl bg-neutral-100"
-              shadow="md"
-            >
-              <p className="-mb-8 p-2 text-xl font-bold">Ethnicity and Risk</p>
-              <p className="-mb-8 mt-6 pl-2 text-sm italic">
-                Distribution of those at risk for each ethnicity
-              </p>
-              <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-                {
-                  <BarChart
-                    data={Object.keys(ethnicity).map((ele: any) => ({
-                      id: ele,
-                      'High Risk': ethnicity[ele]['High Risk'],
-                      'Some Risk': ethnicity[ele]['Some Risk'],
-                      'Low Risk': ethnicity[ele]['Low Risk'],
-                    }))}
-                    colors={colors}
-                    legendVariable="Ethnicity"
-                  />
-                }
-              </div>
-            </Card>
-            <Card
-              className="-mt-12 flex h-[68vh] w-[400px] rounded-xl bg-neutral-100"
-              shadow="md"
-            >
-              <p className="-mb-8 p-2 text-xl font-bold">
-                English Learner and Risk
-              </p>
-              <p className="-mb-8 mt-6 pl-2 text-sm italic">
-                Distribution of those at risk for each english learner
-              </p>
-              <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-                {
-                  <BarChart
-                    data={Object.keys(ell).map((ele: any) => ({
-                      id: ele,
-                      'High Risk': ell[ele]['High Risk'],
-                      'Some Risk': ell[ele]['Some Risk'],
-                      'Low Risk': ell[ele]['Low Risk'],
-                    }))}
-                    colors={colors}
-                    legendVariable="ELL"
-                  />
-                }
-              </div>
-            </Card>
-            <Card
-              className="-mt-12 flex h-[68vh] w-[400px] rounded-xl bg-neutral-100"
-              shadow="md"
-            >
-              <p className="-mb-8 p-2 text-xl font-bold">Gender and Risk</p>
-              <p className="-mb-8 mt-6 pl-2 text-sm italic">
-                Distribution of those at risk for each gender
-              </p>
-              <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-                {
-                  <BarChart
-                    data={Object.keys(genders).map((ele: any) => ({
-                      id: ele,
-                      'High Risk': genders[ele]['High Risk'],
-                      'Some Risk': genders[ele]['Some Risk'],
-                      'Low Risk': genders[ele]['Low Risk'],
-                    }))}
-                    colors={colors}
-                    legendVariable="Gender"
-                  />
-                }
-              </div>
-            </Card>
-          </div>
+          <ChartGroup ethnicityData={ethnicity} ellData={ell} genderData={genders}/>
         </div>
       </div>
     </main>

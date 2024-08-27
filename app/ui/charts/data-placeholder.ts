@@ -1,52 +1,6 @@
 import { RiskChartDataEntry } from "@/app/types/chart-data-entry"
 
-export const dataGender: RiskChartDataEntry[] = [
-  new RiskChartDataEntry('Male', [
-    {label: 'High Risk', value: 0.08},
-    {label: 'Some Risk', value: 0.44},
-    {label: 'Low Risk', value: 0.48}
-  ]),
-  new RiskChartDataEntry('Female', [
-    {label: 'High Risk', value: 0.12},
-    {label: 'Some Risk', value: 0.33},
-    {label: 'Low Risk', value: 0.55}
-  ])
-]
 
-export const dataDiscipline: RiskChartDataEntry[] = [
-  new RiskChartDataEntry('Suspensions', [
-    {label: 'Zero', value: 0.79},
-    {label: 'One Plus', value: 0.21},
-  ]),
-  new RiskChartDataEntry('ODR', [
-    {label: 'Zero', value: 0.8},
-    {label: 'One Plus', value: 0.2},
-  ]),
-]
-
-export const dataTestRisk: RiskChartDataEntry[] = [
-  new RiskChartDataEntry('Reading', [
-    {label: 'Low', value: 0.79},
-    {label: 'Some', value: 0.21},
-  ]),
-  new RiskChartDataEntry('Math', [
-    {label: 'Low', value: 0.8},
-    {label: 'Some', value: 0.2},
-  ]),
-]
-
-// {
-//   id: 'Male',
-//   'High Risk': .08,
-//   'Some Risk': .44,
-//   'Low Risk': .48
-// },
-// {
-//   id: 'Female',
-//   'High Risk': .12,
-//   'Some Risk': .33,
-//   'Low Risk': .55
-// },
 
 export const dataEthnicity = [
   {

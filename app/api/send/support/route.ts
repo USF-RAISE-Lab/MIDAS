@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const { emailFormat } = await request.json();
     const { data, error } = await resend.emails.send({
-      from: 'noreply@gabrielhooks.dev',
+      from: 'onboarding@resend.dev',
       to: `${emailFormat.receiver}`,
       subject: 'Technical Support',
       html: `Name: ${emailFormat.name}<br/><br/>Issue: ${emailFormat.description}`

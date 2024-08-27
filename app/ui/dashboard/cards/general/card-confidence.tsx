@@ -142,24 +142,25 @@ export function CardConfidenceVisualizer({
   confidence,
   confidenceThresholds,
   missingVariables,
+  className
 }: {
   confidence: number;
   confidenceThresholds: number[];
   missingVariables: number;
+  className?: string;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
-    <Tooltip content={TooltipContent()} placement="bottom" className="h-full">
-      <div onClick={onOpen}>
+    <Tooltip content={TooltipContent()} placement="bottom" >
+      <div onClick={onOpen} className={`${className}`}>
         <Card
-          className={`${nunito.className} h-full rounded-xl bg-neutral-100`}
+          className={`${nunito.className} bg-neutral-100`}
           shadow="md"
         >
           <CardHeader className="flex flex-col">
-            <h3 className="text-lg font-medium text-slate-800">
-              {' '}
-              MIDAS Risk Confidence{' '}
+            <h3 className="text-lg font-medium text-nowrap text-slate-800">
+              MIDAS Risk Confidence
             </h3>
           </CardHeader>
 
@@ -171,7 +172,7 @@ export function CardConfidenceVisualizer({
                 thresholds={confidenceThresholds}
               />
             </div>
-            <p className="-mt-2 ml-auto mr-0 pb-1 pr-0 text-sm italic ">
+            <p className="-mt-2 ml-auto mr-0 pb-1 pr-0 text-sm text-nowrap italic ">
               Click to see more information
             </p>
           </CardBody>
