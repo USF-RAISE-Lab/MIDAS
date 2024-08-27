@@ -13,6 +13,7 @@ import MyBarChart from '@/app/ui/charts/bar-chart';
 import { registerables, Chart } from 'chart.js';
 import { getSchoolRiskValues } from '@/app/lib/get-risk-values';
 import { ChartGroup } from '@/app/ui/charts/chart-group';
+import { RiskCard } from '@/app/ui/dashboard/risk-card';
 
 function MidasRiskTooltipContent() {
   return (
@@ -97,15 +98,18 @@ export default function Page() {
               />
             </div>
 
-            <div className="">
-              <CardDisciplinarySummary
-                title={'Disciplinary Action Summary'}
-                valuesTop={['76%', '24%']}
-                subtitlesTop={['Zero', 'One Plus']}
-                valuesBottom={['21%', '79%']}
-                subtitlesBottom={['Zero', 'One Plus']}
-              />
-            </div>
+
+            <RiskCard 
+              title={'Discipline'} 
+              assessments={[
+                {
+                  name: 'ODR',
+                  values: [1, 2, 5],
+                  labels: ['a', 'b', 'c', 'd'],
+                  tooltipText: 'ODR Tooltip test'
+                },
+              ]}                
+            />
 
             <div className="-mb-8">
               <CardTestScoreSummary
