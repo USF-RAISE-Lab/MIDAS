@@ -155,10 +155,10 @@ export function CardConfidenceVisualizer({
     <Tooltip content={TooltipContent()} placement="bottom" >
       <div onClick={onOpen} className={`${className}`}>
         <Card
-          className={`${nunito.className} bg-neutral-100`}
+          className={`${nunito.className} bg-neutral-50 h-full`}
           shadow="md"
         >
-          <CardHeader className="flex flex-col">
+          <CardHeader className="">
             <h3 className="text-lg font-medium text-nowrap text-slate-800">
               MIDAS Risk Confidence
             </h3>
@@ -172,7 +172,7 @@ export function CardConfidenceVisualizer({
                 thresholds={confidenceThresholds}
               />
             </div>
-            <p className="-mt-2 ml-auto mr-0 pb-1 pr-0 text-sm text-nowrap italic ">
+            <p className="mt-auto mb-0 ml-auto mr-0 pb-1 pr-0 text-sm text-nowrap italic ">
               Click to see more information
             </p>
           </CardBody>

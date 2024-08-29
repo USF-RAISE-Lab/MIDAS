@@ -4,7 +4,7 @@
  */
 
 import clsx from 'clsx';
-import React from 'react';
+import React, { Fragment, ReactElement } from 'react';
 import { Card, CardHeader, Tooltip, Divider } from '@nextui-org/react';
 import { Nunito } from 'next/font/google';
 const nunito = Nunito({
@@ -20,7 +20,7 @@ type Assessment = {
   name: string;
   values: string[] | number[];
   labels: string[];
-  tooltipText: string;
+  tooltipContent: string | ReactElement;
 }
 
 /**
@@ -80,18 +80,20 @@ function Row({
 /**
  * Display one or more rows containing a title and one or more metrics, which contain a value and a label.
  * @param {string} title The title of the card.
- * @param {Assessment[]} assessments The contents of a row. Contains title, values, labels, and tooltipText.
+ * @param {Assessment[]} assessments The contents of a row. Contains name, values, labels, and tooltipText.
  * @returns {React.JSX.Element}
  */
 export function RiskCard({
   title,
-  assessments
+  assessments,
+  className
 }: {
   title: string;
-  assessments: Assessment[]
+  assessments: Assessment[];
+  className?: string;
 }) {
   return (
-    <Card className={`${nunito.className} items-center justify-center rounded-xl bg-neutral-100 pb-2`}>
+    <Card className={`${nunito.className} items-center justify-center rounded-xl bg-neutral-50 pb-2 ${className}`}>
       <CardHeader className="">
         <h3 className="text-lg font-medium text-slate-800">{title}</h3>
       </CardHeader>
@@ -99,8 +101,8 @@ export function RiskCard({
       <div className="flex flex-col justify-between w-full px-8">
         {assessments.map((assessment: Assessment, index: number) => {
           return (
-            <>
-              <Tooltip content={assessment.tooltipText} placement="bottom">
+            <Fragment key={index}>
+              <Tooltip content={assessment.tooltipContent} placement="bottom" className='max-w-[32rem]'>
                 <div className='flex'>
                   <Row
                     title={assessment.name}
@@ -112,7 +114,7 @@ export function RiskCard({
               {index < assessments.length - 1 && (
                 <Divider className="mb-1 mt-0" />
               )}
-            </>
+            </Fragment>
           )
         })}
       </div>

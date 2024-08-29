@@ -20,11 +20,13 @@ const nunito = Nunito({weight: ['200', '200'], subsets:['latin'], style: ['norma
 export default function ClassSearch({
   selectedClass,
   setSelectedClass,
-  studentList
+  studentList,
+  className
 }: {
   selectedClass: string;
   setSelectedClass : React.Dispatch<React.SetStateAction<string>>;
   studentList: string[];
+  className?: string;
 }) {
   const SearchAction = async (formData: FormData) => {
     const id = formData.get('classroomId') || ""
@@ -34,7 +36,7 @@ export default function ClassSearch({
   const studentContext = useSearchContext('student');
 
   return (
-    <Card className="bg-neutral-100" shadow='md'>
+    <Card className={`bg-neutral-100 ${className}`} shadow='md'>
         <CardHeader className={nunito.className}>
           <h3 className="text-lg font-medium text-slate-800">Currently viewing class </h3>&nbsp;<span className="font-extrabold underline">{selectedClass}</span>
         </CardHeader>

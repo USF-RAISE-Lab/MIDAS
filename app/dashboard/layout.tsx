@@ -15,7 +15,7 @@ export default async function Layout({ children }: { children: React.ReactNode})
   return (
     
     <SearchContextProvider>
-    <div className={`flex h-screen flex-col md:flex-row md:overflow-hidden`}>
+    <div className={`flex bg-neutral-50 h-screen flex-col md:flex-row md:overflow-hidden`}>
       <div className={`${nunito.className} font-medium md:absolute md:h-screen md:z-20`}>
         <SideNav />
       </div>
