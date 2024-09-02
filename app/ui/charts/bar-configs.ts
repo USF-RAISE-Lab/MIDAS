@@ -14,6 +14,7 @@ Chart.register(
 export const stackedBarOptions: ChartOptions<'bar'> = {
   responsive: true,
   maintainAspectRatio: false,
+  indexAxis: 'x',
   datasets: {
     bar: {
       barPercentage: 0.7

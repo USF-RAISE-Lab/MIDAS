@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
+import { getServerSession } from "next-auth";
 
 
 export default function LoginModal({
@@ -38,6 +39,8 @@ export default function LoginModal({
       password: formData.get('password'),
       redirect: false
     });
+
+    // console.log(await getServerSession())
 
     // If there was no error in the signIn function, go to dashboard/school
     if (!response?.error) {

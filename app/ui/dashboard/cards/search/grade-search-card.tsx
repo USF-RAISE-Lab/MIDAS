@@ -21,12 +21,14 @@ export default function GradeSearch({
   selectedGrade,
   setSelectedGrade,
   gradeList,
-  classList
+  classList,
+  className
 }: {
   selectedGrade: string;
   setSelectedGrade : React.Dispatch<React.SetStateAction<string>>;
   gradeList: string[];
   classList: string[];
+  className?: string;
 }) {
   
   const classContext = useSearchContext('classroom');
@@ -34,7 +36,7 @@ export default function GradeSearch({
   return (
     
 
-    <Card className="bg-neutral-100 w-full" shadow='md'>
+    <Card className={`bg-neutral-100 w-full ${className}`} shadow='md'>
         <CardHeader className={nunito.className}>
           <h3 className="text-lg font-medium text-slate-800">Currently viewing grade </h3>&nbsp;<span className="font-extrabold underline">{selectedGrade}</span>
         </CardHeader>

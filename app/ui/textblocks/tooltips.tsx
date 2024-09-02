@@ -4,11 +4,12 @@
  */
 
 // import chartImage from '@/public/temporary weights chart.png';
+import { Divider } from '@nextui-org/react';
 import Image from 'next/image';
 
 export function MidasRiskScoreTooltip() {
   return ( 
-  <div className='flex flex-col justify-center items-center'>
+  <div className='flex flex-col gap-4'>
     <p>Percentage of students at Low, Some, or High risk based on the MIDAS Risk Indication. 
     This risk score is compiled from various data variables, including gender, grade/school level, 
     ethnicity, English Language Learner Status, Office Disciplinary Referrals, Suspensions, 
@@ -16,7 +17,7 @@ export function MidasRiskScoreTooltip() {
     Each variable has a specific weight that contributes to the MIDAS Risk Indication. 
     Below are the weights of each variable.</p>
 
-    <br/><br/>
+    <Divider orientation='horizontal'/>
     {/* <Image src={chartImage} alt='chart image'/>  */}
 
     <p className="italic">The MIDAS Risk Score should not be used as a diagnostic tool nor 

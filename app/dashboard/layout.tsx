@@ -1,8 +1,10 @@
+'use client';
 import SideNav from '@/app/ui/dashboard/sidenav';
 import CaptureScreenshotButton from '../ui/CaptureScreenshotButton';
 import ToasterProvider from '@/providers/ToastProvider';
 import { SearchContextProvider } from '../context/nav-search-context-provider';
 import { Nunito } from 'next/font/google';
+import { getSession, SessionProvider } from 'next-auth/react';
 
 const nunito = Nunito({
   weight: ['200', '300'],
@@ -15,7 +17,7 @@ export default async function Layout({ children }: { children: React.ReactNode})
   return (
     
     <SearchContextProvider>
-    <div className={`flex h-screen flex-col md:flex-row md:overflow-hidden`}>
+    <div className={`flex bg-neutral-50 h-screen flex-col md:flex-row md:overflow-hidden`}>
       <div className={`${nunito.className} font-medium md:absolute md:h-screen md:z-20`}>
         <SideNav />
       </div>

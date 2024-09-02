@@ -13,12 +13,9 @@ import MyBarChart from '@/app/ui/charts/bar-chart';
 import { registerables, Chart } from 'chart.js';
 import { getSchoolRiskValues } from '@/app/lib/get-risk-values';
 import { ChartGroup } from '@/app/ui/charts/chart-group';
+import { RiskCard } from '@/app/ui/dashboard/risk-card';
+import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 
-function MidasRiskTooltipContent() {
-  return (
-    <div>Percentages of students at the three different MIDAS risk levels.</div>
-  );
-}
 
 export default function Page() {
   const schoolLevel = useSchoolLevel();
@@ -59,102 +56,150 @@ export default function Page() {
   }
 
   const genderRisk = getCurrentState(genderState);
-  
+
   return (
-    <main>
-      <div className="flex gap-4">
-        {/* LEFT COL */}
+    <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
 
-        <div className="mb-4 flex basis-1/5 flex-col">
-          <div className="flex flex-col gap-3 ">
-            {/* <Card className="w-full bg-neutral-100" shadow="md">
-              <CardHeader className='z-0'>
-                <h3 className="text-lg font-medium text-slate-800">
-                  Currently viewing school page{' '}
-                </h3>
-              </CardHeader>
-            </Card> */}
+      {/* Row 1 */}
+      <RiskCard
+        title={'MIDAS Main Risk'}
+        assessments={[
+          {
+            name: '',
+            values: ['33%', '33%', '33%'],
+            labels: ['Low', 'Some', 'High'],
+            tooltipContent: MidasRiskScoreTooltip()
+          },
+        ]}
+        className=''
+      />
+      <CardConfidenceVisualizer
+        missingVariables={0}
+        confidence={3}
+        confidenceThresholds={[1, 2, 3, 4, 5]}
+        className=''
+      />
+      <RiskCard
+        title={'Teacher Sub-Risk'}
+        assessments={[
+          {
+            name: '',
+            values: ['33%', '33%', '33%'],
+            labels: ['Low', 'Some', 'High'],
+            tooltipContent: 'Sub risk'
+          },
+        ]}
+        className=''
+      />
+      <RiskCard
+        title={'Student Sub-Risk'}
+        assessments={[
+          {
+            name: '',
+            values: ['33%', '33%', '33%'],
+            labels: ['Low', 'Some', 'High'],
+            tooltipContent: 'Sub risk'
+          },
+        ]}
+        className=''
+      />
 
+      {/* Row 2 */}
+      <RiskCard
+        title={'Discipline Summary'}
+        assessments={[
+          {
+            name: 'ODR',
+            values: ['33%', '33%'],
+            labels: ['Zero', 'One +'],
+            tooltipContent: 'ODR'
+          },
+          {
+            name: 'Suspensions',
+            values: ['33%', '33%'],
+            labels: ['Zero', 'One +'],
+            tooltipContent: 'Suspensions'
+          }
+        ]}
+        className='lg:row-span-2 max-lg:order-5 lg:order-5'
+      />
 
-            <div className="">
-              <CardThreeValue
-                title="MIDAS Risk Scores"
-                values={[
-                  midasRisk['low'],
-                  midasRisk['some'],
-                  midasRisk['high'],
-                ]}
-                subtitles={['Low', 'Some', 'High']}
-                tooltip={MidasRiskTooltipContent()}
-              />
-            </div>
+      <RiskCard
+        title={'Test Risk Scores'}
+        assessments={[
+          {
+            name: 'Math',
+            values: ['33%', '33%'],
+            labels: ['Zero', 'One +'],
+            tooltipContent: 'ODR'
+          },
+          {
+            name: 'Reading',
+            values: ['33%', '33%'],
+            labels: ['Zero', 'One +'],
+            tooltipContent: ''
+          }
+        ]}
+        className='lg:row-span-2 lg:order-last'
+      />
 
-            <div className="">
-              <CardConfidenceVisualizer
-                missingVariables={0}
-                confidence={3}
-                confidenceThresholds={[1, 2, 3, 4, 5]}
-              />
-            </div>
-
-            <div className="">
-              <CardDisciplinarySummary
-                title={'Disciplinary Action Summary'}
-                valuesTop={['76%', '24%']}
-                subtitlesTop={['Zero', 'One Plus']}
-                valuesBottom={['21%', '79%']}
-                subtitlesBottom={['Zero', 'One Plus']}
-              />
-            </div>
-
-            <div className="-mb-8">
-              <CardTestScoreSummary
-                title={'Test Score Risk Summary'}
-                valuesTop={['60%', '40%']}
-                subtitlesTop={['Low', 'Some']}
-                valuesBottom={['55%', '45%']}
-                subtitlesBottom={['Low', 'Some']}
-              />
-            </div>
-          </div>
+      <Card
+        className="rounded-xl bg-neutral-50 max-lg:order-last max-md:col-span-1 max-lg:col-span-2 lg:row-span-5 lg:order-6"
+        shadow="md"
+      >
+        <p className="-mb-8 p-2 text-xl font-bold">
+          Ethnicity and Risk
+        </p>
+        <p className="-mb-8 mt-6 pl-2 text-sm italic">
+          Distribution of those at risk for each ethnicity
+        </p>
+        <div className="mb-0 mt-auto flex h-full flex-col pt-10 ">
+          <MyBarChart data={Object.keys(ethnicity).map((ele: any) => ({
+            label: ele,
+            highRisk: ethnicity[ele]['High Risk'],
+            someRisk: ethnicity[ele]['Some Risk'],
+            lowRisk: ethnicity[ele]['Low Risk'],
+          }))} />
         </div>
-        {schoolLevel?.saebrsEmotional && (
-          <div className="h-full w-full basis-4/5 flex-col">
-            <div className="-mb-8 flex w-full flex-row gap-3">
-              <div className="basis-1/4">
-                <SaebrsSummary
-                  title={'Total'}
-                  saebrsValues={['N/A', 'N/A', 'N/A']}
-                  mySaebrsValues={['N/A', 'N/A', 'N/A']}
-                />
-              </div>
-              <div className="basis-1/4">
-                <SaebrsSummary
-                  title={'Social'}
-                  saebrsValues={getSchoolRiskValues(schoolLevel, 'Saebrs', 'saebrsSocial')}
-                  mySaebrsValues={getSchoolRiskValues(schoolLevel, 'MySaebrs', 'mySaebrsSocial')}
-                />
-              </div>
-              <div className="basis-1/4">
-                <SaebrsSummary
-                  title={'Academic'}
-                  saebrsValues={getSchoolRiskValues(schoolLevel, 'Saebrs', 'saebrsAcademic')}
-                  mySaebrsValues={getSchoolRiskValues(schoolLevel, 'MySaebrs', 'mySaebrsAcademic')}
-                />
-              </div>
-              <div className="basis-1/4">
-                <SaebrsSummary
-                  title={'Emotional'}
-                  saebrsValues={getSchoolRiskValues(schoolLevel, 'Saebrs', 'saebrsEmotional')}
-                  mySaebrsValues={getSchoolRiskValues(schoolLevel, 'MySaebrs', 'mySaebrsEmotional')}
-                />
-              </div>
-            </div>
+      </Card>
 
-            <ChartGroup ethnicityData={ethnicity} ellData={ell} genderData={genders}/>
-          </div>
-        )}
-      </div>
+      <Card
+        className="rounded-xl bg-neutral-50 max-lg:order-last max-md:col-span-1 max-lg:col-span-2 lg:row-span-5 lg:order-7"
+        shadow="md"
+      >
+        <p className="-mb-8 p-2 text-xl font-bold">
+          English Learner and Risk
+        </p>
+        <p className="-mb-8 mt-6 pl-2 text-sm italic">
+          Distribution of those at risk for English learners and speakers
+        </p>
+        <div className="mb-0 mt-auto flex h-full flex-col pt-10">
+          <MyBarChart data={Object.keys(ell).map((ele: any) => ({
+            label: ele,
+            highRisk: ell[ele]['High Risk'],
+            someRisk: ell[ele]['Some Risk'],
+            lowRisk: ell[ele]['Low Risk'],
+          }))} />
+        </div>
+      </Card>
+
+      <Card
+        className="rounded-xl bg-neutral-50 max-lg:order-last max-md:col-span-1 max-lg:col-span-2 lg:row-span-5 lg:order-8"
+        shadow="md"
+      >
+        <p className="-mb-8 p-2 text-xl font-bold">Gender and Risk</p>
+        <p className="-mb-8 mt-6 pl-2 text-sm italic">
+          Distribution of those at risk for each gender
+        </p>
+        <div className="mb-0 mt-auto flex h-full flex-col pt-10">
+          <MyBarChart data={Object.keys(genders).map((ele: any) => ({
+            label: ele,
+            highRisk: genders[ele]['High Risk'],
+            someRisk: genders[ele]['Some Risk'],
+            lowRisk: genders[ele]['Low Risk'],
+          }))} />
+        </div>
+      </Card>
     </main>
   );
 }
