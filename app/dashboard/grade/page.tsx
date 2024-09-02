@@ -123,8 +123,18 @@ export default function Page() {
   }
 
   return (
-    <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
+    <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4   max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
       {/* Row 1 */}
+
+      <GradeSearch
+        selectedGrade={selectedGrade}
+        setSelectedGrade={grade.set}
+        gradeList={Object.keys(gradeLevel.mySaebrsAcademic).map(
+          (grade) => grade,
+        )}
+        classList={['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}
+        className='lg:order-last order-first max-lg:col-span-full'
+      />
 
       <RiskCard
         title={'MIDAS Main Risk'}
@@ -208,15 +218,7 @@ export default function Page() {
         className='lg:row-span-2 lg:order-9'
       />
 
-      <GradeSearch
-        selectedGrade={selectedGrade}
-        setSelectedGrade={grade.set}
-        gradeList={Object.keys(gradeLevel.mySaebrsAcademic).map(
-          (grade) => grade,
-        )}
-        classList={['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}
-        className='lg:order-last order-first max-lg:col-span-full'
-      />
+      
 
       <Card
         className="rounded-xl bg-neutral-50 max-lg:order-last max-md:col-span-1 max-lg:col-span-2 lg:row-span-5 lg:order-6"

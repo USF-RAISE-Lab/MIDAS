@@ -172,7 +172,7 @@ export function CardConfidenceVisualizer({
                 thresholds={confidenceThresholds}
               />
             </div>
-            <p className="mt-auto mb-0 ml-auto mr-0 pb-1 pr-0 text-sm text-nowrap italic ">
+            <p className="absolute bottom-3 right-2 ml-auto mr-0 pb-1 pr-0 text-sm text-nowrap italic ">
               Click to see more information
             </p>
           </CardBody>

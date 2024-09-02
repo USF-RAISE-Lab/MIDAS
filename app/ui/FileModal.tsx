@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Modal from './Modal';
 import Input from './Input';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
@@ -28,6 +28,8 @@ import useClassLevel from '@/hooks/useClassLevel';
 import { useDropzone } from 'react-dropzone';
 
 import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { DropRowsBySchoolId, UploadDataToSupabase } from '../api/data/uploadSchoolData';
+import { getSession, SessionContext, SessionProvider, useSession } from 'next-auth/react';
 
 const data_frame: string[] = [
   'odr_f',
@@ -46,12 +48,26 @@ const data_frame: string[] = [
   'saebrs_aca',
 ];
 
-export const convertCsvToJson = (data: ArrayBuffer) => {
+export const convertCsvToJson = async (data: ArrayBuffer) => {
+  // Get current user school_id to append to json
+  const session = await getSession();
+
   const workbook = read(data, { dense: true });
 
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
   const JSONdata: any[] = utils.sheet_to_json(sheet);
+
+  console.log("JSON DATA")
+  console.log(JSONdata)
+
+  // Append school_id to json
+  JSONdata.forEach((obj) => {
+    obj.school_id = session?.user.school_id; // School id of user
+  })
+
+
+  DropRowsBySchoolId(session?.user.school_id);
 
   return JSONdata;
 };
@@ -95,7 +111,6 @@ const FileModal = () => {
   const schooLevel = useSchoolLevel();
   const gradeLevel = useGradeLevel();
   const classLevel = useClassLevel();
-
   //handle form
   const { register, handleSubmit, reset, setValue, watch } =
     useForm<FieldValues>({
@@ -140,91 +155,21 @@ const FileModal = () => {
 
       let file1: File = values.document1?.[0];
 
-      // For checking file name - not good security
-      // if ((await CompareSchoolNames(file1)) == false) {
-      //   toast.error('You are not permitted to open this file');
-      //   // throw(new Error("User is not permitted to open this file."))
-      //   return;
-      // }
-
       if (!file1) {
         toast.error('Missing fields');
         return;
       }
 
       const data1 = await file1.arrayBuffer();
-      // const data2 = await file2.arrayBuffer();
-      // const data3 = await file3.arrayBuffer();
-      // const data4 = await file4.arrayBuffer();
-      // const data5 = await file5.arrayBuffer();
-      // const data6 = await file6.arrayBuffer();
 
-      let uploadData: any = convertCsvToJson(data1);
+      console.log("ABCBCBCB")
+      // console.log(session)
+      let uploadData: any = await convertCsvToJson(data1);
+      console.log("UploadData")
+      console.log(uploadData);
 
-      // const inputData: any = convertCsvToJson(data2);
-
-      // const mathRiskData: any = convertCsvToJson(data3);
-
-      // const readRiskData: any = convertCsvToJson(data4);
-
-      // //get ODR data
-      // const odrRiskData: any = convertCsvToJson(data6);
-
-      // const suspRiskData: any = convertCsvToJson(data5);
-
-      // const m: any = new Map();
-      // uploadData.forEach(function (x: any) {
-      //   x.id = null;
-      //   m.set(
-      //     `${x.odr_f},${x.susp_f},${x.gender},${x.ethnicity},${x.ell},${x.schoollevel},${x.math_f},${x.read_f},${x.mysaebrs_emo},${x.mysaebrs_soc},${x.mysaebrs_aca},${x.saebrs_emo},${x.saebrs_soc},${x.saebrs_aca}`,
-      //     x,
-      //   );
-      // });
-
-      // inputData.forEach(function (x: any) {
-      //   var existing = m.get(
-      //     `${x.odr_f},${x.susp_f},${x.gender},${x.ethnicity},${x.ell},${x.schoollevel},${x.math_f},${x.read_f},${x.mysaebrs_emo},${x.mysaebrs_soc},${x.mysaebrs_aca},${x.saebrs_emo},${x.saebrs_soc},${x.saebrs_aca}`,
-      //   );
-      //   if (existing) {
-      //     const a = { id: x.id };
-      //     Object.assign(existing, a);
-      //   }
-      // });
-
-      // uploadData = structuredClone(Array.from(m.values()));
-
-      // //deep clone the array after matching
-
-      // // //filter for math risk
-      // const mathRisk = setSecondMatchingRiskFactor(
-      //   uploadData,
-      //   mathRiskData,
-      //   'math_risk',
-      //   'math_confidence',
-      // );
-
-      // // //filter for read risk
-      // const readRisk = setSecondMatchingRiskFactor(
-      //   uploadData,
-      //   readRiskData,
-      //   'read_risk',
-      //   'read_confidence',
-      // );
-
-      // const odrRisk = setSecondMatchingRiskFactor(
-      //   uploadData,
-      //   odrRiskData,
-      //   'odr_risk',
-      //   'odr_confidence',
-      // );
-
-      // // //filter for suspension risk
-      // const suspRisk = setSecondMatchingRiskFactor(
-      //   uploadData,
-      //   suspRiskData,
-      //   'susp_risk',
-      //   'susp_confidence',
-      // );
+      
+      UploadDataToSupabase(uploadData);
 
       //mysaeber Emotion Risk
       schooLevel.setMySaebrsEmotional(
@@ -255,32 +200,14 @@ const FileModal = () => {
         getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_soc', 'MySaebrs'),
       );
 
-      // schooLevel.setRiskMath(
-      //   getmyRiskStatsSchoolLevel(suspRisk, 'math_risk', 'math_risk'),
-      // );
 
-      // schooLevel.setRiskReading(
-      //   getmyRiskStatsSchoolLevel(suspRisk, 'read_risk', 'read_risk'),
-      // );
 
-      // schooLevel.setRiskSuspension(
-      //   getmyRiskStatsSchoolLevel(suspRisk, 'susp_risk', 'susp_risk'),
-      // );
 
-      // //set ODR for school level
-      // schooLevel.setRiskODR(
-      //   getmyRiskStatsSchoolLevel(suspRisk, 'odr_risk', 'odr_risk'),
-      // );
-
-      // schooLevel.setConfidenceLevel(getConfidenceLvel(suspRisk));
 
       schooLevel.setlistOfAllStudents(uploadData);
 
-      // schooLevel.setGenderRisk(getDemographic(suspRisk, 'gender'));
 
-      // schooLevel.setEllRisk(getDemographic(suspRisk, 'ell'));
 
-      // schooLevel.setEthnicityRisk(getDemographic(suspRisk, 'ethnicity'));
 
       //mysaeber Emotion Risk
       gradeLevel.setMySaebrsEmotional(
@@ -310,38 +237,6 @@ const FileModal = () => {
       gradeLevel.setSaebrsSocial(
         getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsSocial'),
       );
-
-      // gradeLevel.setRiskMath(
-      //   getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'math_risk'),
-      // );
-
-      // gradeLevel.setRiskReading(
-      //   getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'read_risk'),
-      // );
-
-      // gradeLevel.setRiskSuspension(
-      //   getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'susp_risk'),
-      // );
-
-      // gradeLevel.setRiskODR(
-      //   getMyRiskStatsGradeLevel(suspRisk, 'gradelevel', 'odr_risk'),
-      // );
-
-      // gradeLevel.setConfidenceLevel(
-      //   getConfidenceLevelForGradeLevel(suspRisk, 'gradelevel'),
-      // );
-
-      // gradeLevel.setGenderRisk(
-      //   getDemographicGradeLevel(suspRisk, 'gradelevel', 'gender'),
-      // );
-
-      // gradeLevel.setEthnicityRisk(
-      //   getDemographicGradeLevel(suspRisk, 'gradelevel', 'ethnicity'),
-      // );
-
-      // gradeLevel.setEllRisk(
-      //   getDemographicGradeLevel(suspRisk, 'gradelevel', 'ell'),
-      // );
 
       //classroom
 
@@ -374,38 +269,6 @@ const FileModal = () => {
         getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsSocial'),
       );
 
-      // classLevel.setRiskMath(
-      //   getMyRiskStatsGradeLevel(suspRisk, 'classroom', 'math_risk'),
-      // );
-
-      // classLevel.setRiskReading(
-      //   getMyRiskStatsGradeLevel(suspRisk, 'classroom', 'read_risk'),
-      // );
-
-      // classLevel.setRiskSuspension(
-      //   getMyRiskStatsGradeLevel(suspRisk, 'classroom', 'susp_risk'),
-      // );
-
-      // classLevel.setConfidenceLevel(
-      //   getConfidenceLevelForGradeLevel(suspRisk, 'classroom'),
-      // );
-
-      // classLevel.setGenderRisk(
-      //   getDemographicGradeLevel(suspRisk, 'classroom', 'gender'),
-      // );
-
-      // classLevel.setEthnicityRisk(
-      //   getDemographicGradeLevel(suspRisk, 'classroom', 'ethnicity'),
-      // );
-
-      // classLevel.setEllRisk(
-      //   getDemographicGradeLevel(suspRisk, 'classroom', 'ell'),
-      // );
-
-      // classLevel.setRiskODR(
-      //   getMyRiskStatsGradeLevel(suspRisk, 'classroom', 'odr_risk'),
-      // );
-
       router.refresh();
       setIsLoading(false);
       toast.success('File uploaded');
@@ -419,6 +282,7 @@ const FileModal = () => {
   };
 
   return (
+    <SessionProvider>
     <>
       <Modal
         title="Uploading a Document"
@@ -481,6 +345,7 @@ const FileModal = () => {
         </form>
       </Modal>
     </>
+    </SessionProvider>
   );
 };
 

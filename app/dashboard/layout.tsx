@@ -1,8 +1,10 @@
+'use client';
 import SideNav from '@/app/ui/dashboard/sidenav';
 import CaptureScreenshotButton from '../ui/CaptureScreenshotButton';
 import ToasterProvider from '@/providers/ToastProvider';
 import { SearchContextProvider } from '../context/nav-search-context-provider';
 import { Nunito } from 'next/font/google';
+import { getSession, SessionProvider } from 'next-auth/react';
 
 const nunito = Nunito({
   weight: ['200', '300'],

@@ -76,6 +76,8 @@ const handler = NextAuth({
       customSession.user.is_admin = customToken.is_admin!;
       customSession.user.school_id = customToken.school_id!;
 
+      
+
       // Log the custom session object
       // console.log("Session callback - session:", customSession);
 
@@ -98,6 +100,7 @@ const handler = NextAuth({
         // const currentUser = useCurrentUser()
 
         // console.log({currentUser})
+        
 
         // Call Supabase database function to get the user associated with this username
         const { data, error } = await supabase.rpc('get_user_from_username', {
@@ -115,6 +118,8 @@ const handler = NextAuth({
           user.password,
         );
 
+        console.log(credentials);
+
         if(passwordCorrect) {
           console.log("User password is correct. Logging in.")
           
@@ -125,7 +130,6 @@ const handler = NextAuth({
           // currentUser.setSchoolId(user.school_id);
 
           // console.log('Printing current user ', currentUser);
-
           return {
             id: user.id,
             email: user.email,
