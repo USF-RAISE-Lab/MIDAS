@@ -28,7 +28,7 @@ import useClassLevel from '@/hooks/useClassLevel';
 import { useDropzone } from 'react-dropzone';
 
 import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { DropRowsBySchoolId, UploadDataToSupabase } from '../api/data/uploadSchoolData';
+import { DropRowsBySchoolId as DropRowsBySchoolId, JoinWebInput, InsertSchoolData, JoinToRiskScores } from '../api/data/uploadSchoolData';
 import { getSession, SessionContext, SessionProvider, useSession } from 'next-auth/react';
 
 const data_frame: string[] = [
@@ -67,7 +67,6 @@ export const convertCsvToJson = async (data: ArrayBuffer) => {
   })
 
 
-  DropRowsBySchoolId(session?.user.school_id);
 
   return JSONdata;
 };
@@ -84,13 +83,13 @@ export const setSecondMatchingRiskFactor = (
   const m: any = new Map();
 
   //x is one row in the data?
-  uploadData.forEach(function (x: any) {
+  uploadData.forEach(function(x: any) {
     x[riskFactor] = null;
     x[confidenceFactor] = null;
     m.set(x.id, x);
   });
 
-  riskFactorData.forEach(function (x: any) {
+  riskFactorData.forEach(function(x: any) {
     var existing = m.get(x.id);
     if (existing) {
       existing[riskFactor] = x.risk_level;
@@ -149,202 +148,190 @@ const FileModal = () => {
     }
   };
 
+
   const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     try {
       setIsLoading(true);
 
-      let file1: File = values.document1?.[0];
-
+      // Ensure the file exists
+      const file1: File = values.document1?.[0];
       if (!file1) {
         toast.error('Missing fields');
         return;
       }
 
+      // Convert the file to an array buffer and parse it to JSON
       const data1 = await file1.arrayBuffer();
+      const uploadData = await convertCsvToJson(data1);
 
-      console.log("ABCBCBCB")
-      // console.log(session)
-      let uploadData: any = await convertCsvToJson(data1);
-      console.log("UploadData")
-      console.log(uploadData);
+      // Get the user session
+      const session = await getSession();
+      if (!session) {
+        toast.error('User session not found');
+        return;
+      }
 
-      
-      UploadDataToSupabase(uploadData);
+      console.log("UploadData", uploadData);
 
-      //mysaeber Emotion Risk
-      schooLevel.setMySaebrsEmotional(
-        getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_emo', 'MySaebrs'),
-      );
+      // Perform the database operations (await ensures they complete before proceeding)
+      await DropRowsBySchoolId('schooldata', session.user.school_id);
+      await InsertSchoolData(uploadData);
 
-      //saeber Emotion Risk
-      schooLevel.setSaebrsEmotional(
-        getmyRiskStatsSchoolLevel(uploadData, 'saebrs_emo', 'Saebrs'),
-      );
+      await DropRowsBySchoolId('schooldata_join_webinputs', session.user.school_id);
+      await JoinWebInput(session.user.school_id);
 
-      //Saeber Academic Risk
-      schooLevel.setMySaebrsAcademic(
-        getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_aca', 'MySaebrs'),
-      );
+      await DropRowsBySchoolId('schooldata_join_risk', session.user.school_id);
+      await JoinToRiskScores(session.user.school_id);
 
-      //Mysaeber Academic Risk
-      schooLevel.setSaebrsAcademic(
-        getmyRiskStatsSchoolLevel(uploadData, 'saebrs_aca', 'Saebrs'),
-      );
+      // Update state based on the uploaded data
+      updateSchoolLevelData(uploadData);
+      updateGradeLevelData(uploadData);
+      updateClassLevelData(uploadData);
 
-      //Saeber Social Risk
-      schooLevel.setSaebrsSocial(
-        getmyRiskStatsSchoolLevel(uploadData, 'saebrs_soc', 'Saebrs'),
-      );
-      //Mysaeber Social Risk
-      schooLevel.setMySaebrsSocial(
-        getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_soc', 'MySaebrs'),
-      );
-
-
-
-
-
-      schooLevel.setlistOfAllStudents(uploadData);
-
-
-
-
-      //mysaeber Emotion Risk
-      gradeLevel.setMySaebrsEmotional(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsEmotional'),
-      );
-
-      //saeber Emotion Risk
-      gradeLevel.setSaebrsEmotional(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsEmotional'),
-      );
-
-      //MySaeber Academic Risk
-      gradeLevel.setMySaebrsAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsAcademic'),
-      );
-
-      //Saeber Academic Risk
-      gradeLevel.setSaebrsAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsAcademic'),
-      );
-
-      //Mysaeber Social Risk
-      gradeLevel.setMySaebrsSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsSocial'),
-      );
-      //saeber Social Risk
-      gradeLevel.setSaebrsSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsSocial'),
-      );
-
-      //classroom
-
-      //mysaeber Emotion Risk
-      classLevel.setMySaebrsEmotional(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsEmotional'),
-      );
-
-      //saeber Emotion Risk
-      classLevel.setSaebrsEmotional(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsEmotional'),
-      );
-
-      //MySaeber Academic Risk
-      classLevel.setMySaebrsAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsAcademic'),
-      );
-
-      //Saeber Academic Risk
-      classLevel.setSaebrsAcademic(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsAcademic'),
-      );
-
-      //Mysaeber Social Risk
-      classLevel.setMySaebrsSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsSocial'),
-      );
-      //saeber Social Risk
-      classLevel.setSaebrsSocial(
-        getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsSocial'),
-      );
-
+      // Refresh the page to reflect changes
       router.refresh();
-      setIsLoading(false);
+
+      // Show success message and reset the form
       toast.success('File uploaded');
       reset();
       fileModal.onClose();
     } catch (error) {
-      toast.error('Somthing went wrong.');
+      console.error("Error during file upload:", error);
+      toast.error('Something went wrong.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Functions to handle updating different levels
+  const updateSchoolLevelData = (uploadData: any) => {
+    schooLevel.setMySaebrsEmotional(
+      getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_emo', 'MySaebrs')
+    );
+    schooLevel.setSaebrsEmotional(
+      getmyRiskStatsSchoolLevel(uploadData, 'saebrs_emo', 'Saebrs')
+    );
+    schooLevel.setMySaebrsAcademic(
+      getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_aca', 'MySaebrs')
+    );
+    schooLevel.setSaebrsAcademic(
+      getmyRiskStatsSchoolLevel(uploadData, 'saebrs_aca', 'Saebrs')
+    );
+    schooLevel.setSaebrsSocial(
+      getmyRiskStatsSchoolLevel(uploadData, 'saebrs_soc', 'Saebrs')
+    );
+    schooLevel.setMySaebrsSocial(
+      getmyRiskStatsSchoolLevel(uploadData, 'mysaebrs_soc', 'MySaebrs')
+    );
+    schooLevel.setlistOfAllStudents(uploadData);
+  };
+
+  const updateGradeLevelData = (uploadData: any) => {
+    gradeLevel.setMySaebrsEmotional(
+      getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsEmotional')
+    );
+    gradeLevel.setSaebrsEmotional(
+      getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsEmotional')
+    );
+    gradeLevel.setMySaebrsAcademic(
+      getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsAcademic')
+    );
+    gradeLevel.setSaebrsAcademic(
+      getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsAcademic')
+    );
+    gradeLevel.setMySaebrsSocial(
+      getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'mySaebrsSocial')
+    );
+    gradeLevel.setSaebrsSocial(
+      getMyRiskStatsGradeLevel(uploadData, 'gradelevel', 'saebrsSocial')
+    );
+  };
+
+  const updateClassLevelData = (uploadData: any) => {
+    classLevel.setMySaebrsEmotional(
+      getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsEmotional')
+    );
+    classLevel.setSaebrsEmotional(
+      getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsEmotional')
+    );
+    classLevel.setMySaebrsAcademic(
+      getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsAcademic')
+    );
+    classLevel.setSaebrsAcademic(
+      getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsAcademic')
+    );
+    classLevel.setMySaebrsSocial(
+      getMyRiskStatsGradeLevel(uploadData, 'classroom', 'mySaebrsSocial')
+    );
+    classLevel.setSaebrsSocial(
+      getMyRiskStatsGradeLevel(uploadData, 'classroom', 'saebrsSocial')
+    );
+  };
+
+
   return (
     <SessionProvider>
-    <>
-      <Modal
-        title="Uploading a Document"
-        description=""
-        isOpen={fileModal.isOpen}
-        onChange={onChange}
-      >
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col items-center justify-center gap-y-4"
+      <>
+        <Modal
+          title="Uploading a Document"
+          description=""
+          isOpen={fileModal.isOpen}
+          onChange={onChange}
         >
-          <div
-            {...getRootProps()}
-            className={` item-center flex h-72 w-full flex-col justify-center border-2 border-dashed p-3 ${
-              isDragActive
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col items-center justify-center gap-y-4"
+          >
+            <div
+              {...getRootProps()}
+              className={` item-center flex h-72 w-full flex-col justify-center border-2 border-dashed p-3 ${isDragActive
                 ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-300 bg-gray-50'
-            }`}
-          >
-            <AiOutlineCloudUpload size={50} className="mx-auto" />
-            {selectedFile && selectedFile[0] ? (
-              <p className="mb-4 text-sm text-gray-500">
-                Selected file: {selectedFile[0].name}
-              </p>
-            ) : (
-              <p>
-                {isDragActive ? (
-                  <span>
-                    <b>Drop the document to get started</b> or click
-                  </span>
-                ) : (
-                  <span>
-                    <b>Click to Choose School File ( .xlsx or .csv )</b> or drag
-                    it here
-                  </span>
-                )}
-              </p>
-            )}
-
-            <Input
-              className="hidden"
-              {...getInputProps}
-              id="document1"
-              disabled={isLoading}
-              {...register('document1', { required: true })}
-            />
-          </div>
-
-          {isLoading ? (
-            <BounceLoader className=" m-auto" color="blue" size={40} />
-          ) : (
-            <Button
-              disabled={isLoading}
-              type="submit"
-              className="m-auto w-20 font-semibold"
+                }`}
             >
-              Upload
-            </Button>
-          )}
-        </form>
-      </Modal>
-    </>
+              <AiOutlineCloudUpload size={50} className="mx-auto" />
+              {selectedFile && selectedFile[0] ? (
+                <p className="mb-4 text-sm text-gray-500">
+                  Selected file: {selectedFile[0].name}
+                </p>
+              ) : (
+                <p>
+                  {isDragActive ? (
+                    <span>
+                      <b>Drop the document to get started</b> or click
+                    </span>
+                  ) : (
+                    <span>
+                      <b>Click to Choose School File ( .xlsx or .csv )</b> or drag
+                      it here
+                    </span>
+                  )}
+                </p>
+              )}
+
+              <Input
+                className="hidden"
+                {...getInputProps}
+                id="document1"
+                disabled={isLoading}
+                {...register('document1', { required: true })}
+              />
+            </div>
+
+            {isLoading ? (
+              <BounceLoader className=" m-auto" color="blue" size={40} />
+            ) : (
+              <Button
+                disabled={isLoading}
+                type="submit"
+                className="m-auto w-20 font-semibold"
+              >
+                Upload
+              </Button>
+            )}
+          </form>
+        </Modal>
+      </>
     </SessionProvider>
   );
 };

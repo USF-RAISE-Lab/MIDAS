@@ -21,7 +21,7 @@
  */
 import { createClient } from "@supabase/supabase-js";
 
- 
+
 
 const supabaseUrl = 'https://kalbwmivszjzlnepcebm.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -37,31 +37,55 @@ function ValidateColumns() {
  * 
  * This feels unsafe.
  */
-export async function DropRowsBySchoolId(school_id: number) {
+export async function DropRowsBySchoolId(tableName: string, schoolId: number) {
   console.log("START DROPPING ROWS");
 
-  const {data, error} = await supabase
-  .from('schooldata')
-  .delete()
-  .eq('school_id', school_id);
+  const { data, error } = await supabase
+    .from(tableName)
+    .delete()
+    .eq('school_id', schoolId);
 
   if (error) {
     console.log("Error deleting rows ", error);
   }
   else {
-    console.log("Deleted rows of school_id ", school_id);
+    console.log("Deleted rows of school_id ", schoolId);
   }
 }
 
-export async function UploadDataToSupabase(jsonArray: any) {
+export async function InsertSchoolData(jsonArray: any) {
   console.log("ATTEMPTED UPLOAD")
   console.log(jsonArray)
   const { data, error } = await supabase
-      .from('schooldata')
-      .insert(jsonArray); // or 'representation' for full return
+    .from('schooldata')
+    .insert(jsonArray); // or 'representation' for full return
 
-    if (error) {
-      console.error('Error uploading data:', error);
-      // Handle error (e.g., rollback, retry, log)
-    }
+  if (error) {
+    console.error('Error uploading data:', error);
+    // Handle error (e.g., rollback, retry, log)
+  }
+}
+
+export async function JoinWebInput(schoolId: number) {
+  console.log("JOINING")
+  let { data, error } = await supabase
+    .rpc('create_sd_join_webinputs', {
+      _school_id: schoolId
+    })
+  if (error) {
+    console.error(error)
+  }
+  else {
+    console.log(data)
+    console.log("JOINED SUCCESSFUL");
+  }
+}
+
+export async function JoinToRiskScores(schoolId: number) {
+  let { data, error } = await supabase
+    .rpc('create_join_risk', {
+      _school_id: schoolId
+    })
+  if (error) console.error(error)
+  else console.log("JOINED SUCCESSFUL");
 }

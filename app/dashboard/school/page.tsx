@@ -15,11 +15,15 @@ import { getSchoolRiskValues } from '@/app/lib/get-risk-values';
 import { ChartGroup } from '@/app/ui/charts/chart-group';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
+import { FetchRiskData, FetchSchoolData } from '@/app/api/data/downloadSchoolData';
+
 
 
 export default function Page() {
   const schoolLevel = useSchoolLevel();
   console.log(schoolLevel);
+  FetchSchoolData(1);
+  FetchRiskData(1);
 
   const [genderState, setGenderState] = useState({
     math_risk: false,

@@ -65,8 +65,8 @@ export default function SideNav() {
                 }
               )}
             >
-                Support
-              </div>
+              Support
+            </div>
           </button>
 
           <button
@@ -87,7 +87,7 @@ export default function SideNav() {
             </div>
           </button>
         </div>
-        
+
       </div>
     </div>
   );
