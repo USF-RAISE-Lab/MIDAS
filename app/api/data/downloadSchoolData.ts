@@ -27,7 +27,7 @@ export async function FetchSchoolData(schoolId: number) {
   }
   else {
     console.log("Successfully fetched schooldata rows")
-    console.log(data);
+    return data;
   }
 }
 
@@ -46,22 +46,9 @@ export async function FetchRiskData(schoolId: number) {
     console.log(error);
   }
   else {
-    console.log("Successfully fetched risk data rows")
+    console.log("Successfully fetched risk data rows");
     console.log(data);
+    return data;
   }
 }
 
-export async function FetchSchoolData2(schoolId: number) {
-
-  const { data, error } = await supabase
-    .rpc('select_all_from_schooldata_and_risk', {
-      _school_id: schoolId
-    })
-  if (error) {
-    console.log(error);
-  }
-  else {
-    console.log("Successfully fetched schooldata rows")
-    console.log(data);
-  }
-}

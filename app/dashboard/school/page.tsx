@@ -22,44 +22,10 @@ import { FetchRiskData, FetchSchoolData } from '@/app/api/data/downloadSchoolDat
 export default function Page() {
   const schoolLevel = useSchoolLevel();
   console.log(schoolLevel);
-  FetchSchoolData(1);
-  FetchRiskData(1);
 
-  const [genderState, setGenderState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
-
-  const [ellState, setEllState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
-  const [midasRisk, setMidasRisk] = useState({
-    low: '45%',
-    some: '40%',
-    high: '15%',
-  });
-
-  const getCurrentState = (states: any) => {
-    const arr = Object.keys(states).filter((state: any) => {
-      if (states[state]) return state;
-    });
-
-    if (arr) return arr[0];
-    return undefined;
-  };
-
-  if (schoolLevel.listOfAllStudents === undefined) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2">
-        <div>Please upload all of the data files first.</div>
-      </div>
-    );
-  }
-
-  const genderRisk = getCurrentState(genderState);
+  // FetchSchoolData(1);
+  // FetchRiskData(1);
+  // const schoolData = useSchoolData();
 
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
