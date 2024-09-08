@@ -4,7 +4,7 @@ import { SaebrsSummary } from '@/app/ui/dashboard/cards/population/saebrs-summar
 import { CardDisciplinarySummary } from '@/app/ui/dashboard/cards/population/disciplinary-summary';
 import { CardTestScoreSummary } from '@/app/ui/dashboard/cards/population/test-scores-summary';
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CardThreeValue } from '@/app/ui/dashboard/cards/general/card-three-value';
 import { Card, CardHeader } from '@nextui-org/react';
 import useSchoolLevel from '@/hooks/useSchoolLevel';
@@ -16,16 +16,53 @@ import { ChartGroup } from '@/app/ui/charts/chart-group';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import { FetchRiskData, FetchSchoolData } from '@/app/api/data/downloadSchoolData';
-
+import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
+import { calculateRiskByDemographic, calculateRiskPercentages } from '@/action/calculateRiskStatistics';
 
 
 export default function Page() {
-  const schoolLevel = useSchoolLevel();
-  console.log(schoolLevel);
 
-  // FetchSchoolData(1);
-  // FetchRiskData(1);
-  // const schoolData = useSchoolData();
+  const schoolid = 1;
+  const midasStore = useMidasStore();
+
+  const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
+
+
+
+  useEffect(() => {
+    const school = midasStore.getStudentsBySchoolId(schoolid);
+    console.log("Student data:", school);
+
+    setSchoolData(school);
+  }, [midasStore, schoolid]);
+
+  const dashboardData: DashboardData = {
+    midasRiskPercentages: calculateRiskPercentages(schoolData!, 'midas'),
+    teacherRiskPercentages: calculateRiskPercentages(schoolData!, 'teacher'),
+    studentRiskPercentages: calculateRiskPercentages(schoolData!, 'student'),
+
+    midasConfidence: "85%", // example value
+
+    odrPercentages: ["10%", "90%"],
+    suspPercentages: ["5%", "95%"],
+
+    mathPercentages: ["45%", "55%"],
+    readPercentages: ["50%", "50%"],
+
+    ethnicityRiskPercentages: {
+      white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'White'),
+      hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Hispanic'),
+      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Other'),
+    },
+    ellRiskPercentages: {
+      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'ELL'),
+      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'Non-ELL'),
+    },
+    genderRiskPercentages: {
+      male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Male'),
+      female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Female'),
+    },
+  };
 
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
@@ -36,7 +73,7 @@ export default function Page() {
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.midasRiskPercentages.low, dashboardData.midasRiskPercentages.some, dashboardData.midasRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: MidasRiskScoreTooltip()
           },

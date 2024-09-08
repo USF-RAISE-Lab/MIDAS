@@ -24,10 +24,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     loadData(1);
   }, []);
 
-  useEffect(() => {
-    const student = midasStore.getStudentById(studentId);
-    console.log("Student data:", student);
-  }, [midasStore, studentId]);
 
   return (
 

@@ -14,7 +14,7 @@ export default function SideNav() {
   const { isOpen: isOpenSignout, onOpen: onOpenSignout, onOpenChange: onOpenChangeSignout } = useDisclosure();
   const { isOpen: isOpenSupport, onOpen: onOpenSupport, onOpenChange: onOpenChangeSupport } = useDisclosure();
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const arrows = {
     'left': <>&larr;</>,
