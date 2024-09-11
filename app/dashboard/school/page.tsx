@@ -1,21 +1,11 @@
 'use client';
 
-import { SaebrsSummary } from '@/app/ui/dashboard/cards/population/saebrs-summary';
-import { CardDisciplinarySummary } from '@/app/ui/dashboard/cards/population/disciplinary-summary';
-import { CardTestScoreSummary } from '@/app/ui/dashboard/cards/population/test-scores-summary';
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';
 import { useEffect, useState } from 'react';
-import { CardThreeValue } from '@/app/ui/dashboard/cards/general/card-three-value';
-import { Card, CardHeader } from '@nextui-org/react';
-import useSchoolLevel from '@/hooks/useSchoolLevel';
-import { ethnicity, genders, ell } from '@/constants/constants';
+import { Card } from '@nextui-org/react';
 import MyBarChart from '@/app/ui/charts/bar-chart';
-import { registerables, Chart } from 'chart.js';
-import { getSchoolRiskValues } from '@/app/lib/get-risk-values';
-import { ChartGroup } from '@/app/ui/charts/chart-group';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
-import { FetchRiskData, FetchSchoolData } from '@/app/api/data/downloadSchoolData';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 
