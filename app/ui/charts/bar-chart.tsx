@@ -1,39 +1,38 @@
 import { Bar } from 'react-chartjs-2';
-import { ChartData, ChartOptions, Chart, registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 import { stackedBarOptions } from './bar-configs';
-import { RiskLevelCategory } from './risk-level-category-type';
 
 Chart.register(...registerables);
 
 function MyBarChart({
   data
 }: {
-  data: RiskLevelCategory[]
+  data: Record<string, RiskPercentage>; 
 }) {
   const formattedData = {
-    labels: data.map(riskLevel => riskLevel.label),
-    datasets  : [
+    labels: Object.keys(data),
+    datasets: [
       {
         label: "Low Risk",
-        data: data.map(riskLevel => riskLevel.lowRisk),
+        data: Object.values(data).map(risk => risk.low / 100),
         backgroundColor: "#4ade80",
       },
       {
         label: "Some Risk",
-        data: data.map(riskLevel => riskLevel.someRisk),
+        data: Object.values(data).map(risk => risk.some / 100),
         backgroundColor: "#fde047",
       },
       {
         label: "High Risk",
-        data: data.map(riskLevel => riskLevel.highRisk),
+        data: Object.values(data).map(risk => risk.high / 100),
         backgroundColor: "#fb7185",
       },
     ],
-  }
+  };
 
   return (
     <Bar data={formattedData} options={stackedBarOptions}/> 
-  )
+  );
 }
 
 export default MyBarChart;

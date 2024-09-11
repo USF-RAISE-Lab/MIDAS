@@ -52,11 +52,11 @@ export default function Page() {
     ethnicityRiskPercentages: {
       white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'White'),
       hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Hispanic'),
-      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Other'),
+      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Other POC'),
     },
     ellRiskPercentages: {
-      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'ELL'),
-      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'Non-ELL'),
+      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'Yes'),
+      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'No'),
     },
     genderRiskPercentages: {
       male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Male'),
@@ -161,12 +161,7 @@ export default function Page() {
           Distribution of those at risk for each ethnicity
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10 ">
-          <MyBarChart data={Object.keys(ethnicity).map((ele: any) => ({
-            label: ele,
-            highRisk: ethnicity[ele]['High Risk'],
-            someRisk: ethnicity[ele]['Some Risk'],
-            lowRisk: ethnicity[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.ethnicityRiskPercentages} />
         </div>
       </Card>
 
@@ -181,12 +176,7 @@ export default function Page() {
           Distribution of those at risk for English learners and speakers
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-          <MyBarChart data={Object.keys(ell).map((ele: any) => ({
-            label: ele,
-            highRisk: ell[ele]['High Risk'],
-            someRisk: ell[ele]['Some Risk'],
-            lowRisk: ell[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.ellRiskPercentages} />
         </div>
       </Card>
 
@@ -199,12 +189,7 @@ export default function Page() {
           Distribution of those at risk for each gender
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-          <MyBarChart data={Object.keys(genders).map((ele: any) => ({
-            label: ele,
-            highRisk: genders[ele]['High Risk'],
-            someRisk: genders[ele]['Some Risk'],
-            lowRisk: genders[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.genderRiskPercentages} />
         </div>
       </Card>
     </main>
