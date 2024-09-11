@@ -18,29 +18,28 @@ const nunito = Nunito({
  */
 type Assessment = {
   name: string;
-  values: string[] | number[];
+  values: number[] | string[];
   labels: string[];
   tooltipContent: string | ReactElement;
 }
 
 /**
  * Small component to display a single value and label pair in a column structure.
- * @param {string | number} value The numeric or string value to display
- * @param {string} label The label to display below the value
- * @returns {React.ReactElement}
+ * @param  value The numeric or string value to display
+ * @param  label The label to display below the value
  */
 function Metric({
   value,
   label
 }: {
-  value: string | number;
+  value: number | string; 
   label: string;
-}) {
+}) : React.ReactElement {
   const isNa = value.toString().toLowerCase() === 'na';
   return (
     <div className="flex flex-col items-center">
       <p className={clsx('text-2xl', { 'text-slate-600': isNa })}>
-        {value.toString().toUpperCase()}
+        {typeof value == 'number' ? value.toFixed(1) + "%" : value}
       </p>
       <p className="text-sm font-extralight italic">{label}</p>
     </div>
@@ -49,10 +48,9 @@ function Metric({
 
 /**
  * Component to display 'n' Metric atoms in a row, with a title.
- * @param {string} title The title to display above the row
- * @param {string[] | number[]} values The values to display, from left to right
- * @param {string[]} labels The labels to display below the values, from left to right
- * @returns {React.JSX.Element}
+ * @param  title The title to display above the row
+ * @param  values The values to display, from left to right
+ * @param  labels The labels to display below the values, from left to right
  */
 function Row({
   title,
@@ -60,9 +58,9 @@ function Row({
   labels
 }: {
   title: string;
-  values: string[] | number[];
+  values: number[] | string[]; 
   labels: string[]
-}) {
+}) : React.ReactElement {
   return (
     <div className="flex h-20 flex-col w-full">
       <p className="text-md">{title}</p>
@@ -79,9 +77,8 @@ function Row({
 
 /**
  * Display one or more rows containing a title and one or more metrics, which contain a value and a label.
- * @param {string} title The title of the card.
- * @param {Assessment[]} assessments The contents of a row. Contains name, values, labels, and tooltipText.
- * @returns {React.JSX.Element}
+ * @param  title The title of the card.
+ * @param  assessments The contents of a row. Contains name, values, labels, and tooltipText.
  */
 export function RiskCard({
   title,
@@ -91,7 +88,7 @@ export function RiskCard({
   title: string;
   assessments: Assessment[];
   className?: string;
-}) {
+}) : React.ReactElement {
   return (
     <Card className={`${nunito.className} items-center justify-center rounded-xl bg-neutral-50 pb-2 ${className}`}>
       <CardHeader className="">

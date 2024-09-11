@@ -17,7 +17,7 @@ import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import { FetchRiskData, FetchSchoolData } from '@/app/api/data/downloadSchoolData';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
-import { calculateRiskByDemographic, calculateRiskPercentages } from '@/action/calculateRiskStatistics';
+import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 
 
 export default function Page() {
@@ -41,13 +41,13 @@ export default function Page() {
     teacherRiskPercentages: calculateRiskPercentages(schoolData!, 'teacher'),
     studentRiskPercentages: calculateRiskPercentages(schoolData!, 'student'),
 
-    midasConfidence: "85%", // example value
+    midasConfidence: calculateModeConfidence(schoolData!, 'midas'), // example value
 
-    odrPercentages: ["10%", "90%"],
-    suspPercentages: ["5%", "95%"],
+    odrPercentages: calculateOccurancePercentages(schoolData!, 'odr_f'),
+    suspPercentages: calculateOccurancePercentages(schoolData!, 'susp_f'),
 
-    mathPercentages: ["45%", "55%"],
-    readPercentages: ["50%", "50%"],
+    mathPercentages: calculateTestRiskPercentages(schoolData!, 'math_f'),
+    readPercentages: calculateTestRiskPercentages(schoolData!, 'read_f'),
 
     ethnicityRiskPercentages: {
       white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'White'),
@@ -82,7 +82,7 @@ export default function Page() {
       />
       <CardConfidenceVisualizer
         missingVariables={0}
-        confidence={3}
+        confidence={dashboardData.midasConfidence}
         confidenceThresholds={[1, 2, 3, 4, 5]}
         className=''
       />
@@ -91,7 +91,7 @@ export default function Page() {
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.studentRiskPercentages.low, dashboardData.studentRiskPercentages.some, dashboardData.studentRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'Sub risk'
           },
@@ -103,7 +103,7 @@ export default function Page() {
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.teacherRiskPercentages.low, dashboardData.teacherRiskPercentages.some, dashboardData.teacherRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'Sub risk'
           },
@@ -117,13 +117,13 @@ export default function Page() {
         assessments={[
           {
             name: 'ODR',
-            values: ['33%', '33%'],
+            values: [dashboardData.odrPercentages.zero, dashboardData.odrPercentages.oneplus],
             labels: ['Zero', 'One +'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Suspensions',
-            values: ['33%', '33%'],
+            values: [dashboardData.suspPercentages.zero, dashboardData.suspPercentages.oneplus],
             labels: ['Zero', 'One +'],
             tooltipContent: 'Suspensions'
           }
@@ -136,14 +136,14 @@ export default function Page() {
         assessments={[
           {
             name: 'Math',
-            values: ['33%', '33%'],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            labels: ['Low', 'Some', 'High'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Reading',
-            values: ['33%', '33%'],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            labels: ['Low', 'Some', 'High'],
             tooltipContent: ''
           }
         ]}
