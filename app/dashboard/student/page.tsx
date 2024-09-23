@@ -1,19 +1,9 @@
+// student/page.ts
+
 'use client';
 
-import { CardMidasRisk } from '@/app/ui/dashboard/cards/individual/midas-summary';
-import { SaebrsSummary } from '@/app/ui/dashboard/cards/individual/saebrs-summary';
-import StudentSearch from '../../ui/dashboard/cards/search/student-search';
 import { useEffect, useState } from 'react';
-import useSchoolLevel from '@/hooks/useSchoolLevel';
-import { useSearchContext } from '@/app/context/nav-search-context';
-import { CardStudentDiscipline } from '@/app/ui/dashboard/cards/individual/disciplinary';
-import { CardStudentTestScores } from '@/app/ui/dashboard/cards/individual/test-scores';
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';
-import { nunito } from '@/app/ui/fonts';
-import { Button } from '@/app/ui/button';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
-import { postData } from '@/app/lib/helpers';
-import { writeFile } from 'xlsx';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
