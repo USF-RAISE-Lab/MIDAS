@@ -1,3 +1,5 @@
+// school/page.tsx
+
 'use client';
 
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';

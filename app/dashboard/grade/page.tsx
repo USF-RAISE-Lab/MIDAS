@@ -1,147 +1,67 @@
+// grade/page.tsx
+
 'use client';
-import { SaebrsSummary } from '@/app/ui/dashboard/cards/population/saebrs-summary';
-import { CardDisciplinarySummary } from '@/app/ui/dashboard/cards/population/disciplinary-summary';
-import { CardTestScoreSummary } from '@/app/ui/dashboard/cards/population/test-scores-summary';
+
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';
-import { useState } from 'react';
-import { CardThreeValue } from '@/app/ui/dashboard/cards/general/card-three-value';
-import useGradeLevel from '@/hooks/useGradeLevel';
-import { useSearchContext } from '@/app/context/nav-search-context';
-import useRiskOptions from '@/hooks/useRiskOptions';
+import { useEffect, useState } from 'react';
 import { Card } from '@nextui-org/react';
-import { ethnicity, genders, ell } from '@/constants/constants';
-import GradeSearchInputOnly from '@/app/ui/dashboard/cards/search/grade-search-input';
-import GradeSearch from '@/app/ui/dashboard/cards/search/grade-search-card';
-import useSchoolLevel from '@/hooks/useSchoolLevel';
 import MyBarChart from '@/app/ui/charts/bar-chart';
-import { getGradeRiskValues, getSchoolRiskValues } from '@/app/lib/get-risk-values';
-import { ChartGroup } from '@/app/ui/charts/chart-group';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
-function MidasRiskTooltipContent() {
-  return (
-    <div>Percentages of students at the three different MIDAS risk levels.</div>
-  );
-}
+import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
+import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
+
 
 export default function Page() {
-  const [genderState, setGenderState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
-  const [ethnicityState, setEthnicityState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
+  const schoolid = 1;
+  const midasStore = useMidasStore();
 
-  const [ellState, setEllState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
-  const riskOptions = useRiskOptions();
-  const gradeLevel = useGradeLevel();
-  console.log(gradeLevel)
-  const grade = useSearchContext('grade');
-  const selectedGrade = grade.get;
+  const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
-  const [midasRisk, setMidasRisk] = useState({
-    low: '45%',
-    some: '40%',
-    high: '15%',
-  });
+  useEffect(() => {
+    const school = midasStore.getStudentsByGradeLevel(schoolid, 7);
+    console.log("Student data:", school);
 
-  const [disciplineRisk, setDisciplineRisk] = useState({
-    odrZero: '77%',
-    odrSome: '23%',
-    suspZero: '80%',
-    suspSome: '20%',
-  });
+    setSchoolData(school);
+  }, [midasStore, schoolid]);
 
-  // ASK SONJA WHAT THE VALUES FOR TEST RISK ARE
-  const [testRisk, setTestRisk] = useState({});
+  const dashboardData: DashboardData = {
+    midasRiskPercentages: calculateRiskPercentages(schoolData!, 'midas'),
+    teacherRiskPercentages: calculateRiskPercentages(schoolData!, 'teacher'),
+    studentRiskPercentages: calculateRiskPercentages(schoolData!, 'student'),
 
-  const [saebrsRisk, setSaebrsRisk] = useState({
-    saebrsTotal: ['60%', '25%', '15%'],
-    mySaebrsTotal: ['54%', '33%', '13%'],
-    saebrsEmotional: ['59%', '33%', '8%'],
-    mySaebrsEmotional: ['50%', '37%', '13%'],
-    saebrsSocial: ['40%', '41%', '19%'],
-    mySaebrsSocial: ['40%', '39%', '17%'],
-    saebrsAcademic: ['72%', '16%', '12%'],
-    mySaebrsAcademic: ['70%', '18%', '12%'],
-  });
+    midasConfidence: calculateModeConfidence(schoolData!, 'midas'), // example value
 
-  const getCurrentState = (states: any) => {
-    const arr = Object.keys(states).filter((state: any) => {
-      if (states[state]) return state;
-    });
+    odrPercentages: calculateOccurancePercentages(schoolData!, 'odr_f'),
+    suspPercentages: calculateOccurancePercentages(schoolData!, 'susp_f'),
 
-    if (arr) return arr[0];
-    return undefined;
+    mathPercentages: calculateTestRiskPercentages(schoolData!, 'math_f'),
+    readPercentages: calculateTestRiskPercentages(schoolData!, 'read_f'),
+
+    ethnicityRiskPercentages: {
+      white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'White'),
+      hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Hispanic'),
+      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Other POC'),
+    },
+    ellRiskPercentages: {
+      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'Yes'),
+      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'No'),
+    },
+    genderRiskPercentages: {
+      male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Male'),
+      female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Female'),
+    },
   };
-
-  // Stops proceeding to dashboard before uploading data
-  const schoolLevel = useSchoolLevel();
-  if (schoolLevel.listOfAllStudents === undefined) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2">
-        <div>Please upload all of the data files first.</div>
-      </div>
-    );
-  }
-
-  // Stops proceeding to dashboard before selecting a grade level
-  if (!selectedGrade) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2">
-        <div>Please enter a grade to view the dashboard.</div>
-        <div className="w-1/4">
-          <GradeSearchInputOnly
-            selectedGrade={selectedGrade}
-            setSelectedGrade={grade.set}
-            gradeList={Object.keys(gradeLevel.mySaebrsAcademic).map(
-              (grade) => grade,
-            )}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (gradeLevel.mySaebrsAcademic[selectedGrade] === undefined) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <div>
-          The grade is not available and please enter a different grade to view
-          the dashboard.
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4   max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
+    <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
+
       {/* Row 1 */}
-
-      <GradeSearch
-        selectedGrade={selectedGrade}
-        setSelectedGrade={grade.set}
-        gradeList={Object.keys(gradeLevel.mySaebrsAcademic).map(
-          (grade) => grade,
-        )}
-        classList={['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}
-        className='lg:order-last order-first max-lg:col-span-full'
-      />
-
       <RiskCard
         title={'MIDAS Main Risk'}
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.midasRiskPercentages.low, dashboardData.midasRiskPercentages.some, dashboardData.midasRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: MidasRiskScoreTooltip()
           },
@@ -150,7 +70,7 @@ export default function Page() {
       />
       <CardConfidenceVisualizer
         missingVariables={0}
-        confidence={3}
+        confidence={dashboardData.midasConfidence}
         confidenceThresholds={[1, 2, 3, 4, 5]}
         className=''
       />
@@ -159,7 +79,7 @@ export default function Page() {
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.studentRiskPercentages.low, dashboardData.studentRiskPercentages.some, dashboardData.studentRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'Sub risk'
           },
@@ -171,7 +91,7 @@ export default function Page() {
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.teacherRiskPercentages.low, dashboardData.teacherRiskPercentages.some, dashboardData.teacherRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'Sub risk'
           },
@@ -185,13 +105,13 @@ export default function Page() {
         assessments={[
           {
             name: 'ODR',
-            values: ['33%', '33%'],
+            values: [dashboardData.odrPercentages.zero, dashboardData.odrPercentages.oneplus],
             labels: ['Zero', 'One +'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Suspensions',
-            values: ['33%', '33%'],
+            values: [dashboardData.suspPercentages.zero, dashboardData.suspPercentages.oneplus],
             labels: ['Zero', 'One +'],
             tooltipContent: 'Suspensions'
           }
@@ -204,21 +124,19 @@ export default function Page() {
         assessments={[
           {
             name: 'Math',
-            values: ['33%', '33%'],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            labels: ['Low', 'Some', 'High'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Reading',
-            values: ['33%', '33%'],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            labels: ['Low', 'Some', 'High'],
             tooltipContent: ''
           }
         ]}
-        className='lg:row-span-2 lg:order-9'
+        className='lg:row-span-2 lg:order-last'
       />
-
-      
 
       <Card
         className="rounded-xl bg-neutral-50 max-lg:order-last max-md:col-span-1 max-lg:col-span-2 lg:row-span-5 lg:order-6"
@@ -231,12 +149,7 @@ export default function Page() {
           Distribution of those at risk for each ethnicity
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10 ">
-          <MyBarChart data={Object.keys(ethnicity).map((ele: any) => ({
-            label: ele,
-            highRisk: ethnicity[ele]['High Risk'],
-            someRisk: ethnicity[ele]['Some Risk'],
-            lowRisk: ethnicity[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.ethnicityRiskPercentages} />
         </div>
       </Card>
 
@@ -251,12 +164,7 @@ export default function Page() {
           Distribution of those at risk for English learners and speakers
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-          <MyBarChart data={Object.keys(ell).map((ele: any) => ({
-            label: ele,
-            highRisk: ell[ele]['High Risk'],
-            someRisk: ell[ele]['Some Risk'],
-            lowRisk: ell[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.ellRiskPercentages} />
         </div>
       </Card>
 
@@ -269,12 +177,7 @@ export default function Page() {
           Distribution of those at risk for each gender
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-          <MyBarChart data={Object.keys(genders).map((ele: any) => ({
-            label: ele,
-            highRisk: genders[ele]['High Risk'],
-            someRisk: genders[ele]['Some Risk'],
-            lowRisk: genders[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.genderRiskPercentages} />
         </div>
       </Card>
     </main>
