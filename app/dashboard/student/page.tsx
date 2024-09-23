@@ -23,7 +23,7 @@ export default function Page({ searchParams }: SearchProps) {
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
   useEffect(() => {
-    const school = midasStore.getStudentsByGradeLevel(schoolid, 7);
+    const school = midasStore.getStudentById(schoolid, "6A_132");
     console.log("Student data:", school);
 
     setSchoolData(school);
@@ -112,7 +112,7 @@ export default function Page({ searchParams }: SearchProps) {
             tooltipContent: 'Sub risk'
           },
         ]}
-        className=''
+        className=""
       />
 
       {/* Row 2 */}

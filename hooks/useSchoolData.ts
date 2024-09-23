@@ -39,7 +39,7 @@ export interface SchoolData {
 interface MidasState {
   students: Record<string, SchoolData>;
   loadStudents: (students: SchoolData[]) => void;
-  getStudentById: (studentid: string) => SchoolData | null;
+  getStudentById: (schoolId: number, studentId: string) => SchoolData[];
   getStudentsBySchoolId: (schoolId: number) => SchoolData[];
   getStudentsByGradeLevel: (schoolId: number, gradelevel: number) => SchoolData[];
   getStudentsByClassroom: (schoolId: number, classroom: string) => SchoolData[];
@@ -57,8 +57,8 @@ const useMidasStore = create<MidasState>((set, get) => ({
     set({ students: studentMap });
   },
 
-  getStudentById: (studentid: string) => {
-    return get().students[studentid] || null;
+  getStudentById: (schoolId: number, studentId: string) => {
+    return Object.values(get().students).filter(student => student.studentid === studentId && student.school_id === schoolId);
   },
 
   getStudentsBySchoolId: (schoolId: number) => {
