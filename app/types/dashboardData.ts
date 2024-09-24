@@ -1,6 +1,6 @@
 
 interface RiskPercentage {
-  low: number; 
+  low: number;
   some: number;
   high: number;
 }
@@ -36,4 +36,19 @@ interface DashboardData {
     male: RiskPercentage;
     female: RiskPercentage;
   };
+}
+
+interface StudentDashboardData {
+  midasRiskLabel: string;
+  teacherRiskLabel: string;
+  studentRiskLabel: string;
+
+  midasCondfidence: string;
+
+  odrLabel: string;
+  suspLabel: string;
+
+  ethnicity: string;
+  ell: string;
+  gender: string;
 }

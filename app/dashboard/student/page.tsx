@@ -70,19 +70,19 @@ export default function Page({ searchParams }: SearchProps) {
   //  });
   //};
   return (
-    <main className="grid grid-cols-2 grid-rows-5 max-w-[50%] mx-auto">
+    <main className="flex flex-col w-[50%] gap-4 mx-auto">
 
       <RiskCard
         title={'MIDAS Main Risk'}
         assessments={[
           {
             name: '',
-            values: [dashboardData.midasRiskPercentages.low, dashboardData.midasRiskPercentages.some, dashboardData.midasRiskPercentages.high],
-            labels: ['Low', 'Some', 'High'],
+            values: [dashboardData.midasRiskPercentages.low],
+            labels: [],
             tooltipContent: MidasRiskScoreTooltip()
           },
         ]}
-        className=""
+        className="max-h-64"
       />
       <CardConfidenceVisualizer
         missingVariables={0}
