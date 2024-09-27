@@ -17,8 +17,6 @@ const nunito = Nunito({
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const studentId = '10D_361';
-  const midasStore = useMidasStore();
 
   useEffect(() => {
     loadData(1);

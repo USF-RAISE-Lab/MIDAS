@@ -48,6 +48,9 @@ interface StudentDashboardData {
   odrLabel: string;
   suspLabel: string;
 
+  mathLabel: string;
+  readLabel: string;
+
   ethnicity: string;
   ell: string;
   gender: string;

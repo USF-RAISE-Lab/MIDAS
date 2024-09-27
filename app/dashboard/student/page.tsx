@@ -23,13 +23,13 @@ export default function Page({ searchParams }: SearchProps) {
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
   useEffect(() => {
-    const school = midasStore.getStudentById(schoolid, "6A_132");
-    console.log("Student data:", school);
+    const school = midasStore.getStudentById(schoolid, "6A_101");
+    console.log("Individual Student data:", school);
 
     setSchoolData(school);
   }, [midasStore, schoolid]);
 
-  const student = schoolData.pop();
+  const student = schoolData[0];
 
   const dashboardData: StudentDashboardData = {
     midasRiskLabel: student?.risk.midas?.risklevel || "NA",
@@ -40,7 +40,9 @@ export default function Page({ searchParams }: SearchProps) {
     suspLabel: student?.susp_f || "NA",
     ethnicity: student?.ethnicity || "NA",
     ell: student?.ell || "NA",
-    gender: student?.gender || "NA"
+    gender: student?.gender || "NA",
+    mathLabel: student?.math_f || "NA",
+    readLabel: student?.read_f || "NA"
   };
 
   //handle export feature
@@ -62,7 +64,7 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: '',
-            values: [],
+            values: [dashboardData.midasRiskLabel],
             labels: [],
             tooltipContent: MidasRiskScoreTooltip()
           },
@@ -92,8 +94,8 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: '',
-            values: [],
-            labels: ['Low', 'Some', 'High'],
+            values: [dashboardData.studentRiskLabel],
+            labels: [],
             tooltipContent: 'Sub risk'
           },
         ]}
@@ -106,14 +108,14 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: 'ODR',
-            values: [],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.odrLabel],
+            labels: [],
             tooltipContent: 'ODR'
           },
           {
             name: 'Suspensions',
-            values: [],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.suspLabel],
+            labels: [],
             tooltipContent: 'Suspensions'
           }
         ]}
@@ -125,14 +127,14 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: 'Math',
-            values: [],
-            labels: ['Low', 'Some', 'High'],
+            values: [dashboardData.mathLabel],
+            labels: [],
             tooltipContent: 'ODR'
           },
           {
             name: 'Reading',
-            values: [],
-            labels: ['Low', 'Some', 'High'],
+            values: [dashboardData.readLabel],
+            labels: [],
             tooltipContent: ''
           }
         ]}

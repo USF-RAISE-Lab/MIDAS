@@ -58,7 +58,8 @@ const useMidasStore = create<MidasState>((set, get) => ({
   },
 
   getStudentById: (schoolId: number, studentId: string) => {
-    return Object.values(get().students).filter(student => student.studentid === studentId && student.school_id === schoolId);
+    console.log("YEE HAW ", get().students);
+    return Object.values(get().students).filter(student => student.studentid === studentId);
   },
 
   getStudentsBySchoolId: (schoolId: number) => {
