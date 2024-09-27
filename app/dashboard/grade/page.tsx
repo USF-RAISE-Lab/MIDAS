@@ -39,17 +39,17 @@ export default function Page() {
     readPercentages: calculateTestRiskPercentages(schoolData!, 'read_f'),
 
     ethnicityRiskPercentages: {
-      white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'White'),
-      hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Hispanic'),
-      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Other POC'),
+      white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'white'),
+      hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'hispanic'),
+      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'other poc'),
     },
     ellRiskPercentages: {
-      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'Yes'),
-      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'No'),
+      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'yes'),
+      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'no'),
     },
     genderRiskPercentages: {
-      male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Male'),
-      female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Female'),
+      male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'male'),
+      female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'female'),
     },
   };
   return (

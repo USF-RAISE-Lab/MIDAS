@@ -64,8 +64,13 @@ export const convertCsvToJson = async (data: ArrayBuffer) => {
   // Append school_id to json
   JSONdata.forEach((obj) => {
     obj.school_id = session?.user.school_id; // School id of user
-    obj.math_f = session?.user.math_f + " Risk";
-
+    obj.schoollevel = obj.schoollevel.toLowerCase();
+    obj.gender = obj.gender.toLowerCase();
+    obj.ell = obj.ell.toLowerCase();
+    obj.ethnicity = obj.ethnicity.toLowerCase();
+    obj.odr_f = obj.odr_f.toLowerCase();
+    obj.susp_f = obj.susp_f.toLowerCase();
+    console.log("XXXXX ", obj);
   })
 
 

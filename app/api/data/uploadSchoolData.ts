@@ -69,7 +69,7 @@ export async function InsertSchoolData(jsonArray: any) {
 export async function JoinWebInput(schoolId: number) {
   console.log("JOINING")
   let { data, error } = await supabase
-    .rpc('create_sd_join_webinputs', {
+    .rpc('create_sd_join_webinputs_2', {
       _school_id: schoolId
     })
   if (error) {

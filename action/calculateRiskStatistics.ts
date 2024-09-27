@@ -12,9 +12,9 @@ export function calculateRiskPercentages(
 
   students.forEach(student => {
     const riskLevel = student.risk?.[riskType]?.risklevel;
-    if (riskLevel === 'Very Low to Mild') lowRisk++;
-    if (riskLevel === 'Moderate') someRisk++;
-    if (riskLevel === 'Marked') highRisk++;
+    if (riskLevel === 'low') lowRisk++;
+    if (riskLevel === 'some') someRisk++;
+    if (riskLevel === 'high') highRisk++;
   });
 
   return {
@@ -26,7 +26,7 @@ export function calculateRiskPercentages(
 }
 
 
-export function calculateOccurancePercentages(students: SchoolData[], label: 'odr_f' | 'susp_f') : OccurancePercentage {
+export function calculateOccurancePercentages(students: SchoolData[], label: 'odr_f' | 'susp_f'): OccurancePercentage {
   let zero = 0;
   let oneplus = 0;
 
@@ -34,10 +34,10 @@ export function calculateOccurancePercentages(students: SchoolData[], label: 'od
 
   students.forEach(student => {
     const occuranceLevel = student[label as keyof typeof student];
-    
-    if (occuranceLevel === 'Zero') zero++;
-    if (occuranceLevel === 'One or More') oneplus++;
-   
+
+    if (occuranceLevel === 'zero') zero++;
+    if (occuranceLevel === 'one or more') oneplus++;
+
   });
 
   console.log("Calculated occurance percentages: " + zero.toString() + " " + oneplus.toString() + " " + totalStudents.toString())
@@ -49,8 +49,8 @@ export function calculateOccurancePercentages(students: SchoolData[], label: 'od
 
 }
 
-export function calculateTestRiskPercentages(students: SchoolData[], label: 'math_f' | 'read_f') : {low: number, some: number, high: number, total: number} {
-  
+export function calculateTestRiskPercentages(students: SchoolData[], label: 'math_f' | 'read_f'): { low: number, some: number, high: number, total: number } {
+
   let lowRisk = 0;
   let someRisk = 0;
   let highRisk = 0;
@@ -59,9 +59,9 @@ export function calculateTestRiskPercentages(students: SchoolData[], label: 'mat
 
   students.forEach(student => {
     const riskLevel = student[label as keyof typeof student];
-    if (riskLevel === 'Low Risk') lowRisk++;
-    if (riskLevel === 'Some Risk') someRisk++;
-    if (riskLevel === 'High Risk') highRisk++;
+    if (riskLevel === 'low') lowRisk++;
+    if (riskLevel === 'some') someRisk++;
+    if (riskLevel === 'high') highRisk++;
   });
 
   return {
@@ -86,34 +86,34 @@ export function calculateRiskByDemographic(
 export function calculateModeConfidence(
   students: SchoolData[],
   riskType: 'midas' | 'student' | 'teacher',
-)  {
+) {
 
   let frequency = {
-    'Low': 0,
-    'Moderate': 0,
-    'High': 0
+    'low': 0,
+    'some': 0,
+    'high': 0
   }
 
-  const lowLabel = 'Low';
-  const midLabel = 'Moderate';
-  const highLabel = 'High';
+  const lowLabel = 'low';
+  const midLabel = 'some';
+  const highLabel = 'high';
 
   students.forEach((student: SchoolData) => {
     if (student.risk![riskType]!.confidence === lowLabel) {
-      frequency['Low']++;
+      frequency['low']++;
     }
     else if (student.risk![riskType]!.confidence === midLabel) {
-      frequency['Moderate']++;
+      frequency['some']++;
     }
     else if (student.risk![riskType]!.confidence === highLabel) {
-      frequency['High']++;
+      frequency['high']++;
     }
   });
 
   // Cringe typescript moment
   let maxKey: keyof typeof frequency | null = null;
   let maxValue = 0;
-  
+
   for (const key in frequency) {
     if (frequency[key as keyof typeof frequency] > maxValue) {
       maxValue++;

@@ -43,7 +43,7 @@ interface StudentDashboardData {
   teacherRiskLabel: string;
   studentRiskLabel: string;
 
-  midasCondfidence: string;
+  midasConfidence: string;
 
   odrLabel: string;
   suspLabel: string;

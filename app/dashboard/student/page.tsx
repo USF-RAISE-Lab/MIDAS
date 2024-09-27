@@ -29,33 +29,18 @@ export default function Page({ searchParams }: SearchProps) {
     setSchoolData(school);
   }, [midasStore, schoolid]);
 
-  const dashboardData: DashboardData = {
-    midasRiskPercentages: calculateRiskPercentages(schoolData!, 'midas'),
-    teacherRiskPercentages: calculateRiskPercentages(schoolData!, 'teacher'),
-    studentRiskPercentages: calculateRiskPercentages(schoolData!, 'student'),
+  const student = schoolData.pop();
 
-    midasConfidence: calculateModeConfidence(schoolData!, 'midas'), // example value
-
-    odrPercentages: calculateOccurancePercentages(schoolData!, 'odr_f'),
-    suspPercentages: calculateOccurancePercentages(schoolData!, 'susp_f'),
-
-    mathPercentages: calculateTestRiskPercentages(schoolData!, 'math_f'),
-    readPercentages: calculateTestRiskPercentages(schoolData!, 'read_f'),
-
-    ethnicityRiskPercentages: {
-      white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'White'),
-      hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Hispanic'),
-      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'Other POC'),
-    },
-
-    ellRiskPercentages: {
-      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'Yes'),
-      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'No'),
-    },
-    genderRiskPercentages: {
-      male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Male'),
-      female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'Female'),
-    },
+  const dashboardData: StudentDashboardData = {
+    midasRiskLabel: student?.risk.midas?.risklevel || "NA",
+    teacherRiskLabel: student?.risk.teacher?.risklevel || "NA",
+    studentRiskLabel: student?.risk.student?.risklevel || "NA",
+    midasConfidence: student?.risk.midas?.confidence || "NA",
+    odrLabel: student?.odr_f || "NA",
+    suspLabel: student?.susp_f || "NA",
+    ethnicity: student?.ethnicity || "NA",
+    ell: student?.ell || "NA",
+    gender: student?.gender || "NA"
   };
 
   //handle export feature
@@ -77,7 +62,7 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: '',
-            values: [dashboardData.midasRiskPercentages.low],
+            values: [],
             labels: [],
             tooltipContent: MidasRiskScoreTooltip()
           },
@@ -95,8 +80,8 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: '',
-            values: [dashboardData.studentRiskPercentages.low, dashboardData.studentRiskPercentages.some, dashboardData.studentRiskPercentages.high],
-            labels: ['Low', 'Some', 'High'],
+            values: [dashboardData.teacherRiskLabel],
+            labels: [],
             tooltipContent: 'Sub risk'
           },
         ]}
@@ -107,7 +92,7 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: '',
-            values: [dashboardData.teacherRiskPercentages.low, dashboardData.teacherRiskPercentages.some, dashboardData.teacherRiskPercentages.high],
+            values: [],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'Sub risk'
           },
@@ -121,13 +106,13 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: 'ODR',
-            values: [dashboardData.odrPercentages.zero, dashboardData.odrPercentages.oneplus],
+            values: [],
             labels: ['Zero', 'One +'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Suspensions',
-            values: [dashboardData.suspPercentages.zero, dashboardData.suspPercentages.oneplus],
+            values: [],
             labels: ['Zero', 'One +'],
             tooltipContent: 'Suspensions'
           }
@@ -140,13 +125,13 @@ export default function Page({ searchParams }: SearchProps) {
         assessments={[
           {
             name: 'Math',
-            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            values: [],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Reading',
-            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            values: [],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: ''
           }
