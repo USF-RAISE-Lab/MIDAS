@@ -13,6 +13,7 @@ import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskBy
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
 import GradeSearch from '@/app/ui/dashboard/cards/search/grade-search-card';
 import { GetGradeOptions } from '@/action/getGradeOptions';
+import { GetClassroomOptions } from '@/action/getClassroomOptions';
 
 
 export default function Page() {
@@ -67,7 +68,8 @@ export default function Page() {
 
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
-      <GradeSearch selectedGrade={gradeSearch} setSelectedGrade={setGradeSearch} gradeList={GetGradeOptions(schoolData!)} classList={[]} />
+      <GradeSearch selectedGrade={gradeSearch} setSelectedGrade={setGradeSearch} gradeList={GetGradeOptions(schoolData!)} classList={GetClassroomOptions(gradeData!)} />
+
       {/* Row 1 */}
       <RiskCardWithConfidence
         title={'MIDAS Main Risk'}
