@@ -10,53 +10,66 @@ import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
+import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
+import GradeSearch from '@/app/ui/dashboard/cards/search/grade-search-card';
+import { GetGradeOptions } from '@/action/getGradeOptions';
 
 
 export default function Page() {
   const schoolid = 1;
   const midasStore = useMidasStore();
 
+  const [gradeData, setGradeData] = useState<SchoolData[]>([]);
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
-  useEffect(() => {
-    const school = midasStore.getStudentsByGradeLevel(schoolid, 7);
-    console.log("Student data:", school);
+  // todo)) Add check for if there are no grades available
+  const [gradeSearch, setGradeSearch] = useState<number>(GetGradeOptions(schoolData!)[0]);
 
+  useEffect(() => {
+    const grade = midasStore.getStudentsByGradeLevel(schoolid, gradeSearch);
+    const school = midasStore.getStudentsBySchoolId(schoolid);
+
+    console.log("Student data:", grade);
+
+    setGradeData(grade);
     setSchoolData(school);
-  }, [midasStore, schoolid]);
+  }, [midasStore, gradeSearch, schoolid]);
+
 
   const dashboardData: DashboardData = {
-    midasRiskPercentages: calculateRiskPercentages(schoolData!, 'midas'),
-    teacherRiskPercentages: calculateRiskPercentages(schoolData!, 'teacher'),
-    studentRiskPercentages: calculateRiskPercentages(schoolData!, 'student'),
+    midasRiskPercentages: calculateRiskPercentages(gradeData!, 'midas'),
+    teacherRiskPercentages: calculateRiskPercentages(gradeData!, 'teacher'),
+    studentRiskPercentages: calculateRiskPercentages(gradeData!, 'student'),
 
-    midasConfidence: calculateModeConfidence(schoolData!, 'midas'), // example value
+    midasConfidence: calculateModeConfidence(gradeData!, 'midas'), // example value
 
-    odrPercentages: calculateOccurancePercentages(schoolData!, 'odr_f'),
-    suspPercentages: calculateOccurancePercentages(schoolData!, 'susp_f'),
+    odrPercentages: calculateOccurancePercentages(gradeData!, 'odr_f'),
+    suspPercentages: calculateOccurancePercentages(gradeData!, 'susp_f'),
 
-    mathPercentages: calculateTestRiskPercentages(schoolData!, 'math_f'),
-    readPercentages: calculateTestRiskPercentages(schoolData!, 'read_f'),
+    mathPercentages: calculateTestRiskPercentages(gradeData!, 'math_f'),
+    readPercentages: calculateTestRiskPercentages(gradeData!, 'read_f'),
 
     ethnicityRiskPercentages: {
-      white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'white'),
-      hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'hispanic'),
-      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'other poc'),
+      white: calculateRiskByDemographic(gradeData!, 'midas', 'ethnicity', 'white'),
+      hispanic: calculateRiskByDemographic(gradeData!, 'midas', 'ethnicity', 'hispanic'),
+      other: calculateRiskByDemographic(gradeData!, 'midas', 'ethnicity', 'other poc'),
     },
     ellRiskPercentages: {
-      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'yes'),
-      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'no'),
+      ell: calculateRiskByDemographic(gradeData!, 'midas', 'ell', 'yes'),
+      nonEll: calculateRiskByDemographic(gradeData!, 'midas', 'ell', 'no'),
     },
     genderRiskPercentages: {
-      male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'male'),
-      female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'female'),
+      male: calculateRiskByDemographic(gradeData!, 'midas', 'gender', 'male'),
+      female: calculateRiskByDemographic(gradeData!, 'midas', 'gender', 'female'),
     },
   };
+
+
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
-
+      <GradeSearch selectedGrade={gradeSearch} setSelectedGrade={setGradeSearch} gradeList={GetGradeOptions(schoolData!)} classList={[]} />
       {/* Row 1 */}
-      <RiskCard
+      <RiskCardWithConfidence
         title={'MIDAS Main Risk'}
         assessments={[
           {
@@ -66,12 +79,6 @@ export default function Page() {
             tooltipContent: MidasRiskScoreTooltip()
           },
         ]}
-        className=''
-      />
-      <CardConfidenceVisualizer
-        missingVariables={0}
-        confidence={dashboardData.midasConfidence}
-        confidenceThresholds={[1, 2, 3, 4, 5]}
         className=''
       />
       <RiskCard
