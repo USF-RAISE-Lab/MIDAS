@@ -28,9 +28,11 @@ interface ColorSelectionInterface {
 export function ConfidenceIntervalVisualizer({
   confidence,
   thresholds,
+  className
 }: {
   confidence: number;
   thresholds: number[];
+  className?: string;
 }) {
   // confidence <= 80, 80 > confidence <= 90, 90 > confidence <= 95,
   const colorList: ColorSelectionInterface = (confidence) => {
@@ -48,7 +50,7 @@ export function ConfidenceIntervalVisualizer({
   };
 
   return (
-    <div className="mx-2 flex flex-row">
+    <div className={`mx-2 flex flex-row ${className}`}>
       <Square color={colorList(confidence)[0]} />
       <Square color={colorList(confidence)[1]} />
       <Square color={colorList(confidence)[2]} />
