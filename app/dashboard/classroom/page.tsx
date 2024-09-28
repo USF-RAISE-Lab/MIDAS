@@ -11,6 +11,7 @@ import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 import ClassSearch from '@/app/ui/dashboard/cards/search/class-search-card';
+import { GetClassroomOptions } from '@/action/getClassroomOptions';
 
 
 export default function Page() {
@@ -59,7 +60,7 @@ export default function Page() {
   };
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
-      <ClassSearch selectedClass={selectedClass} setSelectedClass={setSelectedClass} studentList={schoolData.map(student => student.studentid)} />
+      <ClassSearch selectedClass={selectedClass} setSelectedClass={setSelectedClass} classList={GetClassroomOptions(schoolData)} studentList={schoolData.map(student => student.studentid)} />
       {/* Row 1 */}
       <RiskCard
         title={'MIDAS Main Risk'}
