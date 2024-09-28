@@ -10,51 +10,56 @@ import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
+import ClassSearch from '@/app/ui/dashboard/cards/search/class-search-card';
 
 
 export default function Page() {
   const schoolid = 1;
   const midasStore = useMidasStore();
 
+  const [classData, setClassData] = useState<SchoolData[]>([]);
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
-  useEffect(() => {
-    const school = midasStore.getStudentsByClassroom(schoolid, 'A');
-    console.log("Student data:", school);
+  const [selectedClass, setSelectedClass] = useState<string>(schoolData.map(student => student.classroom)[0]);
 
-    setSchoolData(school);
-  }, [midasStore, schoolid]);
+  useEffect(() => {
+    const classroom = midasStore.getStudentsByClassroom(schoolid, selectedClass);
+    const school = midasStore.getStudentsBySchoolId(schoolid);
+
+    setSchoolData(school)
+    setClassData(classroom);
+  }, [midasStore, selectedClass, schoolid]);
 
   const dashboardData: DashboardData = {
-    midasRiskPercentages: calculateRiskPercentages(schoolData!, 'midas'),
-    teacherRiskPercentages: calculateRiskPercentages(schoolData!, 'teacher'),
-    studentRiskPercentages: calculateRiskPercentages(schoolData!, 'student'),
+    midasRiskPercentages: calculateRiskPercentages(classData!, 'midas'),
+    teacherRiskPercentages: calculateRiskPercentages(classData!, 'teacher'),
+    studentRiskPercentages: calculateRiskPercentages(classData!, 'student'),
 
-    midasConfidence: calculateModeConfidence(schoolData!, 'midas'), // example value
+    midasConfidence: calculateModeConfidence(classData!, 'midas'), // example value
 
-    odrPercentages: calculateOccurancePercentages(schoolData!, 'odr_f'),
-    suspPercentages: calculateOccurancePercentages(schoolData!, 'susp_f'),
+    odrPercentages: calculateOccurancePercentages(classData!, 'odr_f'),
+    suspPercentages: calculateOccurancePercentages(classData!, 'susp_f'),
 
-    mathPercentages: calculateTestRiskPercentages(schoolData!, 'math_f'),
-    readPercentages: calculateTestRiskPercentages(schoolData!, 'read_f'),
+    mathPercentages: calculateTestRiskPercentages(classData!, 'math_f'),
+    readPercentages: calculateTestRiskPercentages(classData!, 'read_f'),
 
     ethnicityRiskPercentages: {
-      white: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'white'),
-      hispanic: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'hispanic'),
-      other: calculateRiskByDemographic(schoolData!, 'midas', 'ethnicity', 'other poc'),
+      white: calculateRiskByDemographic(classData!, 'midas', 'ethnicity', 'white'),
+      hispanic: calculateRiskByDemographic(classData!, 'midas', 'ethnicity', 'hispanic'),
+      other: calculateRiskByDemographic(classData!, 'midas', 'ethnicity', 'other poc'),
     },
     ellRiskPercentages: {
-      ell: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'yes'),
-      nonEll: calculateRiskByDemographic(schoolData!, 'midas', 'ell', 'no'),
+      ell: calculateRiskByDemographic(classData!, 'midas', 'ell', 'yes'),
+      nonEll: calculateRiskByDemographic(classData!, 'midas', 'ell', 'no'),
     },
     genderRiskPercentages: {
-      male: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'male'),
-      female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'female'),
+      male: calculateRiskByDemographic(classData!, 'midas', 'gender', 'male'),
+      female: calculateRiskByDemographic(classData!, 'midas', 'gender', 'female'),
     },
   };
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
-
+      <ClassSearch selectedClass={selectedClass} setSelectedClass={setSelectedClass} studentList={schoolData.map(student => student.studentid)} />
       {/* Row 1 */}
       <RiskCard
         title={'MIDAS Main Risk'}
@@ -66,12 +71,6 @@ export default function Page() {
             tooltipContent: MidasRiskScoreTooltip()
           },
         ]}
-        className=''
-      />
-      <CardConfidenceVisualizer
-        missingVariables={0}
-        confidence={dashboardData.midasConfidence}
-        confidenceThresholds={[1, 2, 3, 4, 5]}
         className=''
       />
       <RiskCard
