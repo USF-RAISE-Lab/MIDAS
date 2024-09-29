@@ -199,8 +199,13 @@ export function StudentSearch({
   className
 }: {
   selectedStudent: string;
-  setSelectedStudent: React.Dispatch<React.SetStateAction<string>>;
-  data: any;
+  setSelectedStudent: React.Dispatch<React.SetStateAction<string | undefined>>;
+  data: {
+    gradeLevel: string;
+    ethnicity: string;
+    gender: string;
+    ell: string;
+  };
   className?: string;
 }) {
   const SearchAction = async (formData: FormData) => {
@@ -224,7 +229,7 @@ export function StudentSearch({
         <div className="flex w-max basis-full flex-col gap-1">
           <form className="flex w-full flex-row" action={SearchAction}>
             <div className="flex w-full">
-              <StudentAutocomplete options={schoolLevel.listOfAllStudents.map((value: any, index: number) => (value.studentid))} name={'studentId'} />
+              <StudentAutocomplete options={[]} name={'studentId'} />
 
               <Button className="min-w-fit" variant="flat" type="submit">
                 <SimpleLineIconsMagnifier />
@@ -238,7 +243,7 @@ export function StudentSearch({
 
           <DemographicsRow
             content={{
-              grade: data?.gradelevel,
+              grade: data?.gradeLevel,
               gender: data?.gender,
               ell: data?.ell,
               ethnicity: data?.ethnicity,

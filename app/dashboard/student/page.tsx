@@ -2,15 +2,14 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
-import StudentSearch from '@/app/ui/dashboard/student-search';
-import { StudentAutocomplete } from '@/app/ui/autocomplete';
+import { StudentSearch } from '@/app/ui/dashboard/cards/search/student-search';
 
 interface SearchProps {
   searchParams: {
@@ -27,7 +26,7 @@ export default function Page({ searchParams }: SearchProps) {
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
   const [studentData, setStudentData] = useState<SchoolData[]>([]);
 
-  const [studentId, setStudentId] = useState<string>();
+  const [studentId, setStudentId] = useState<string | undefined>();
 
   useEffect(() => {
     if (!studentId) {
@@ -72,10 +71,15 @@ export default function Page({ searchParams }: SearchProps) {
   //    type: 'file',
   //  });
   //};
+  //
+  //
+  console.log(student);
   return (
     <main className="flex flex-col md:w-[70%] p-4 gap-4 mx-auto">
+      <StudentSearch selectedStudent={studentId!} setSelectedStudent={setStudentId}
+        data={{ gradeLevel: student.gradelevel.toString(), gender: student.gender, ethnicity: student.ethnicity, ell: student.ell }} />
+
       <div className="flex md:flex-row flex-col gap-4 md:justify-evenly w-full">
-        <StudentSearch />
         <RiskCardWithConfidence
           title={'MIDAS Main Risk'}
           assessments={[
