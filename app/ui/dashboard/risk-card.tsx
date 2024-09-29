@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import React, { Fragment, ReactElement } from 'react';
 import { Card, CardHeader, Tooltip, Divider } from '@nextui-org/react';
 import { Nunito } from 'next/font/google';
+import { Capitalize } from '@/action/capitalize';
 const nunito = Nunito({
   weight: ['200', '200'],
   subsets: ['latin'],
@@ -32,14 +33,14 @@ function Metric({
   value,
   label
 }: {
-  value: number | string; 
+  value: number | string;
   label: string;
-}) : React.ReactElement {
+}): React.ReactElement {
   const isNa = value.toString().toLowerCase() === 'na';
   return (
     <div className="flex flex-col items-center">
       <p className={clsx('text-2xl', { 'text-slate-600': isNa })}>
-        {typeof value == 'number' ? value.toFixed(1) + "%" : value}
+        {typeof value == 'number' ? value.toFixed(1) + "%" : Capitalize(value)}
       </p>
       <p className="text-sm font-extralight italic">{label}</p>
     </div>
@@ -58,9 +59,9 @@ function Row({
   labels
 }: {
   title: string;
-  values: number[] | string[]; 
+  values: number[] | string[];
   labels: string[]
-}) : React.ReactElement {
+}): React.ReactElement {
   return (
     <div className="flex h-20 flex-col w-full">
       <p className="text-md">{title}</p>
@@ -88,7 +89,7 @@ export function RiskCard({
   title: string;
   assessments: Assessment[];
   className?: string;
-}) : React.ReactElement {
+}): React.ReactElement {
   return (
     <Card className={`${nunito.className} items-center justify-center rounded-xl bg-neutral-50 pb-2 ${className}`}>
       <CardHeader className="">

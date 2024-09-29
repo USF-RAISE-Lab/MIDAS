@@ -9,6 +9,7 @@ import React, { Fragment, ReactElement } from 'react';
 import { Card, CardHeader, Tooltip, Divider } from '@nextui-org/react';
 import { Nunito } from 'next/font/google';
 import { ConfidenceIntervalVisualizer } from './confidence-visualizer';
+import { Capitalize } from '@/action/capitalize';
 const nunito = Nunito({
   weight: ['200', '200'],
   subsets: ['latin'],
@@ -41,7 +42,7 @@ function Metric({
   return (
     <div className="flex flex-col items-center">
       <p className={clsx('text-2xl', { 'text-slate-600': isNa })}>
-        {typeof value == 'number' ? value.toFixed(1) + "%" : value}
+        {typeof value == 'number' ? value.toFixed(1) + "%" : Capitalize(value)}
       </p>
       <p className="text-sm font-extralight italic">{label}</p>
     </div>
