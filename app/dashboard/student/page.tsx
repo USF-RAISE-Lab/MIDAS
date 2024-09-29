@@ -8,6 +8,9 @@ import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
+import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
+import StudentSearch from '@/app/ui/dashboard/student-search';
+import { StudentAutocomplete } from '@/app/ui/autocomplete';
 
 interface SearchProps {
   searchParams: {
@@ -20,16 +23,29 @@ export default function Page({ searchParams }: SearchProps) {
   const schoolid = 1;
   const midasStore = useMidasStore();
 
+
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
+  const [studentData, setStudentData] = useState<SchoolData[]>([]);
+
+  const [studentId, setStudentId] = useState<string>();
 
   useEffect(() => {
-    const school = midasStore.getStudentById(schoolid, "6A_101");
+    if (!studentId) {
+      console.log("studentId is not set yet");
+      setStudentId(schoolData.map(student => student.studentid)[0]);
+      console.log(studentId);
+    }
+    const school = midasStore.getStudentsBySchoolId(schoolid);
+
+    // todo)) This may cause a bug if there is a user with no associated data at all
+    const student = midasStore.getStudentById(schoolid, studentId!);
     console.log("Individual Student data:", school);
 
     setSchoolData(school);
-  }, [midasStore, schoolid]);
+    setStudentData(student);
+  }, [midasStore, studentId, schoolid]);
 
-  const student = schoolData[0];
+  const student = studentData[0];
 
   const dashboardData: StudentDashboardData = {
     midasRiskLabel: student?.risk.midas?.risklevel || "NA",
@@ -57,91 +73,89 @@ export default function Page({ searchParams }: SearchProps) {
   //  });
   //};
   return (
-    <main className="flex flex-col w-[50%] gap-4 mx-auto">
+    <main className="flex flex-col md:w-[70%] p-4 gap-4 mx-auto">
+      <div className="flex md:flex-row flex-col gap-4 md:justify-evenly w-full">
+        <RiskCardWithConfidence
+          title={'MIDAS Main Risk'}
+          assessments={[
+            {
+              name: '',
+              values: [dashboardData.midasRiskLabel],
+              labels: [],
+              tooltipContent: MidasRiskScoreTooltip()
+            },
+          ]}
+          className="max-h-64 w-full"
+        />
 
-      <RiskCard
-        title={'MIDAS Main Risk'}
-        assessments={[
-          {
-            name: '',
-            values: [dashboardData.midasRiskLabel],
-            labels: [],
-            tooltipContent: MidasRiskScoreTooltip()
-          },
-        ]}
-        className="max-h-64"
-      />
-      <CardConfidenceVisualizer
-        missingVariables={0}
-        confidence={dashboardData.midasConfidence}
-        confidenceThresholds={[1, 2, 3, 4, 5]}
-        className=""
-      />
-      <RiskCard
-        title={'Teacher Sub-Risk'}
-        assessments={[
-          {
-            name: '',
-            values: [dashboardData.teacherRiskLabel],
-            labels: [],
-            tooltipContent: 'Sub risk'
-          },
-        ]}
-        className=''
-      />
-      <RiskCard
-        title={'Student Sub-Risk'}
-        assessments={[
-          {
-            name: '',
-            values: [dashboardData.studentRiskLabel],
-            labels: [],
-            tooltipContent: 'Sub risk'
-          },
-        ]}
-        className=""
-      />
+
+        <RiskCard
+          title={'Teacher Sub-Risk'}
+          assessments={[
+            {
+              name: '',
+              values: [dashboardData.teacherRiskLabel],
+              labels: [],
+              tooltipContent: 'Sub risk'
+            },
+          ]}
+          className="w-full"
+        />
+        <RiskCard
+          title={'Student Sub-Risk'}
+          assessments={[
+            {
+              name: '',
+              values: [dashboardData.studentRiskLabel],
+              labels: [],
+              tooltipContent: 'Sub risk'
+            },
+          ]}
+          className="w-full"
+        />
+      </div>
 
       {/* Row 2 */}
-      <RiskCard
-        title={'Discipline Summary'}
-        assessments={[
-          {
-            name: 'ODR',
-            values: [dashboardData.odrLabel],
-            labels: [],
-            tooltipContent: 'ODR'
-          },
-          {
-            name: 'Suspensions',
-            values: [dashboardData.suspLabel],
-            labels: [],
-            tooltipContent: 'Suspensions'
-          }
-        ]}
-        className=""
-      />
+      <div className="flex lg:flex-row flex-col gap-4 justify-evenly">
+        <RiskCard
+          title={'Discipline Summary'}
+          assessments={[
+            {
+              name: 'ODR',
+              values: [dashboardData.odrLabel],
+              labels: [],
+              tooltipContent: 'ODR'
+            },
+            {
+              name: 'Suspensions',
+              values: [dashboardData.suspLabel],
+              labels: [],
+              tooltipContent: 'Suspensions'
+            }
+          ]}
+          className="w-full"
+        />
 
-      <RiskCard
-        title={'Test Risk Scores'}
-        assessments={[
-          {
-            name: 'Math',
-            values: [dashboardData.mathLabel],
-            labels: [],
-            tooltipContent: 'ODR'
-          },
-          {
-            name: 'Reading',
-            values: [dashboardData.readLabel],
-            labels: [],
-            tooltipContent: ''
-          }
-        ]}
-        className=""
-      />
-
-    </main>
+        <RiskCard
+          title={'Test Risk Scores'}
+          assessments={[
+            {
+              name: 'Math',
+              values: [dashboardData.mathLabel],
+              labels: [],
+              tooltipContent: 'ODR'
+            },
+            {
+              name: 'Reading',
+              values: [dashboardData.readLabel],
+              labels: [],
+              tooltipContent: ''
+            }
+          ]}
+          className="w-full"
+        />
+      </div>
+    </main >
 
   );
 }
