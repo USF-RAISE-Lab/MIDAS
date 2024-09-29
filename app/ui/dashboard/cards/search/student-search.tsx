@@ -15,7 +15,7 @@ import {
   Autocomplete,
   AutocompleteItem,
 } from '@nextui-org/react';
-import {useInfiniteScroll} from "@nextui-org/use-infinite-scroll";
+import { useInfiniteScroll } from "@nextui-org/use-infinite-scroll";
 
 import { Nunito } from 'next/font/google';
 import SimpleLineIconsMagnifier from '@/app/ui/icons/SimpleLineIconsMagnifier';
@@ -192,7 +192,7 @@ function DemographicsRow({
   );
 }
 
-export default function StudentSearch({
+export function StudentSearch({
   selectedStudent,
   setSelectedStudent,
   data,

@@ -75,6 +75,7 @@ export default function Page({ searchParams }: SearchProps) {
   return (
     <main className="flex flex-col md:w-[70%] p-4 gap-4 mx-auto">
       <div className="flex md:flex-row flex-col gap-4 md:justify-evenly w-full">
+        <StudentSearch />
         <RiskCardWithConfidence
           title={'MIDAS Main Risk'}
           assessments={[
