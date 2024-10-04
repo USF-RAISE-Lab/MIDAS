@@ -214,7 +214,6 @@ const FileModal = () => {
       setIsLoading(false);
     }
   };
-
   // Functions to handle updating different levels
   const updateSchoolLevelData = (uploadData: any) => {
     schooLevel.setMySaebrsEmotional(

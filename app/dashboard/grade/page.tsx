@@ -158,7 +158,7 @@ export default function Page() {
           Ethnicity and Risk
         </p>
         <p className="-mb-8 mt-6 pl-2 text-sm italic">
-          Distribution of those at risk for each ethnicity
+          Distribution of risk for each ethnicity
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10 ">
           <MyBarChart data={dashboardData.ethnicityRiskPercentages} />
@@ -173,7 +173,7 @@ export default function Page() {
           English Learner and Risk
         </p>
         <p className="-mb-8 mt-6 pl-2 text-sm italic">
-          Distribution of those at risk for English learners and speakers
+          Distribution of risk for English fluency status
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
           <MyBarChart data={dashboardData.ellRiskPercentages} />
@@ -186,7 +186,7 @@ export default function Page() {
       >
         <p className="-mb-8 p-2 text-xl font-bold">Gender and Risk</p>
         <p className="-mb-8 mt-6 pl-2 text-sm italic">
-          Distribution of those at risk for each gender
+          Distribution of risk for each gender
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
           <MyBarChart data={dashboardData.genderRiskPercentages} />
