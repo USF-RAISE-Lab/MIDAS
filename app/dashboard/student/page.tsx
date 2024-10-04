@@ -44,6 +44,42 @@ export default function Page({ searchParams }: SearchProps) {
     setStudentData(student);
   }, [midasStore, studentId, schoolid]);
 
+  if (studentData[0] === undefined) {
+    studentData[0] = {
+      classroom: "",
+      ell: "",
+      ethnicity: "",
+      gender: "",
+      gradelevel: 0,
+      math_f: "",
+      mysaebrs_aca: "",
+      mysaebrs_soc: "",
+      mysaebrs_emo: "",
+      odr_f: "",
+      read_f: "",
+      risk: {
+        midas: {
+          risklevel: "",
+          confidence: ""
+        },
+        teacher: {
+          risklevel: "",
+          confidence: ""
+        },
+        student: {
+          risklevel: "",
+          confidence: ""
+        }
+      },
+      saebrs_aca: "",
+      saebrs_emo: "",
+      saebrs_soc: "",
+      school_id: 1,
+      schoollevel: "",
+      studentid: "",
+      susp_f: ""
+    }
+  }
   const student = studentData[0];
 
   const dashboardData: StudentDashboardData = {
@@ -60,20 +96,11 @@ export default function Page({ searchParams }: SearchProps) {
     readLabel: student?.read_f || "NA"
   };
 
-  //handle export feature
-  //const handleExport = async (listStudents: any) => {
-  //  const result = await postData({
-  //    url: 'https://midas-topaz.vercel.app/api/export',
-  //    data: { listStudents },
-  //  });
-  //  const res = writeFile(result, 'students.xlsx', {
-  //    compression: true,
-  //    type: 'file',
-  //  });
-  //};
-  //
-  //
-  console.log(student);
+  if (student === undefined) {
+    <main>
+      Loading student data...
+    </main>
+  }
   return (
     <main className="flex flex-col md:w-[70%] p-4 gap-4 mx-auto">
       <StudentSearch selectedStudent={studentId!} setSelectedStudent={setStudentId}
@@ -160,6 +187,7 @@ export default function Page({ searchParams }: SearchProps) {
           className="w-full"
         />
       </div>
+
     </main >
 
   );
