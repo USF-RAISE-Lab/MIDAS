@@ -11,6 +11,7 @@ import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
+import { SchoolGreeter } from '@/app/ui/dashboard/cards/school-greeter';
 
 
 export default function Page() {
@@ -60,7 +61,8 @@ export default function Page() {
 
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
-      <p>Hello</p>
+      <SchoolGreeter schoolId={schoolid} />
+
       {/* Row 1 */}
       <RiskCardWithConfidence
         title={'MIDAS Main Risk'}

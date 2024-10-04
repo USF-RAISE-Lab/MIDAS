@@ -44,6 +44,7 @@ export default function Page({ searchParams }: SearchProps) {
     setStudentData(student);
   }, [midasStore, studentId, schoolid]);
 
+  // todo)) This is hacky and should be done differently, but it works for now.
   if (studentData[0] === undefined) {
     studentData[0] = {
       classroom: "",
@@ -96,11 +97,6 @@ export default function Page({ searchParams }: SearchProps) {
     readLabel: student?.read_f || "NA"
   };
 
-  if (student === undefined) {
-    <main>
-      Loading student data...
-    </main>
-  }
   return (
     <main className="flex flex-col md:w-[70%] p-4 gap-4 mx-auto">
       <StudentSearch selectedStudent={studentId!} setSelectedStudent={setStudentId}
