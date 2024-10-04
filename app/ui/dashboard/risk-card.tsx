@@ -65,7 +65,7 @@ function Row({
   return (
     <div className="flex h-20 flex-col w-full">
       <p className="text-md">{title}</p>
-      <div className="flex w-full justify-evenly gap-8 px-8">
+      <div className="flex justify-evenly gap-8 lg:gap-2 xl:gap-8 px-18">
         {values.map((value, index) => (
           <div key={index}>
             <Metric value={value} label={labels[index]} />
