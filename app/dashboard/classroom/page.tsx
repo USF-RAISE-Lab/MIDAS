@@ -13,10 +13,13 @@ import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskBy
 import ClassSearch from '@/app/ui/dashboard/cards/search/class-search-card';
 import { GetClassroomOptions } from '@/action/getClassroomOptions';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
+import { useSession } from 'next-auth/react';
 
 
 export default function Page() {
-  const schoolid = 1;
+  const { data: session } = useSession();
+  const schoolid = session?.user.school_id;
+
   const midasStore = useMidasStore();
 
   const [classData, setClassData] = useState<SchoolData[]>([]);

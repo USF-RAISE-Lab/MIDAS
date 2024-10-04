@@ -47,9 +47,9 @@ const handler = NextAuth({
 
       if (user) {
         const { data, error } = await supabase
-        .rpc('get_user_from_id', {
-          _id: user.id
-        })
+          .rpc('get_user_from_id', {
+            _id: user.id
+          })
 
         if (error) {
           console.error("JWT callback - error:", error);
@@ -64,7 +64,7 @@ const handler = NextAuth({
 
       // Log the token object
       // console.log("JWT callback - token:", token);
-      
+
       return token;
     },
     session: async ({ session, token }) => {
@@ -78,7 +78,7 @@ const handler = NextAuth({
       customSession.user.is_admin = customToken.is_admin!;
       customSession.user.school_id = customToken.school_id!;
 
-      
+
 
       // Log the custom session object
       // console.log("Session callback - session:", customSession);
@@ -102,7 +102,7 @@ const handler = NextAuth({
         // const currentUser = useCurrentUser()
 
         // console.log({currentUser})
-        
+
 
         // Call Supabase database function to get the user associated with this username
         const { data, error } = await supabase.rpc('get_user_from_username', {
@@ -122,9 +122,9 @@ const handler = NextAuth({
 
         console.log(credentials);
 
-        if(passwordCorrect) {
+        if (passwordCorrect) {
           console.log("User password is correct. Logging in.")
-          
+
           // currentUser.setId(user.id);
           // currentUser.setUsername(user.name);
           // currentUser.setEmail(user.email);
@@ -144,7 +144,7 @@ const handler = NextAuth({
 
         console.log("Password was incorrect or another issue occured during login.")
         return null as any;
-      } 
+      }
     })
   ]
 });

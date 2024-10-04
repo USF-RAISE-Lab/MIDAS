@@ -12,11 +12,14 @@ import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
 import { SchoolGreeter } from '@/app/ui/dashboard/cards/school-greeter';
+import { useSession } from 'next-auth/react';
 
 
 export default function Page() {
 
-  const schoolid = 1;
+  const { data: session } = useSession();
+  const schoolid = session?.user.school_id;
+
   const midasStore = useMidasStore();
 
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);

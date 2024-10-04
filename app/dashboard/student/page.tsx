@@ -10,6 +10,7 @@ import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
 import { StudentSearch } from '@/app/ui/dashboard/cards/search/student-search';
+import { useSession } from 'next-auth/react';
 
 interface SearchProps {
   searchParams: {
@@ -19,7 +20,9 @@ interface SearchProps {
 
 export default function Page({ searchParams }: SearchProps) {
 
-  const schoolid = 1;
+  const { data: session } = useSession();
+  const schoolid = session?.user.school_id;
+
   const midasStore = useMidasStore();
 
 

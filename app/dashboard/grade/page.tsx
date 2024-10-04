@@ -14,10 +14,13 @@ import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card'
 import GradeSearch from '@/app/ui/dashboard/cards/search/grade-search-card';
 import { GetGradeOptions } from '@/action/getGradeOptions';
 import { GetClassroomOptions } from '@/action/getClassroomOptions';
+import { useSession } from 'next-auth/react';
 
 
 export default function Page() {
-  const schoolid = 1;
+  const { data: session } = useSession();
+  const schoolid = session?.user.school_id;
+
   const midasStore = useMidasStore();
 
   const [gradeData, setGradeData] = useState<SchoolData[]>([]);
