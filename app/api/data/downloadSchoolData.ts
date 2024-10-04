@@ -17,10 +17,12 @@ const supabase = createClient(supabaseUrl, supabaseKey!);
  * Includes student demographics, test scores, discplinary action data
  */
 export async function FetchSchoolData(schoolId: number) {
+  console.log("YEEEEE HAWWWW")
+  console.log(schoolId)
   const { data, error } = await supabase
     .from('schooldata')
     .select()
-    .eq('school_id', schoolId);
+    .eq('school_id', schoolId)
 
   if (error) {
     console.log(error);

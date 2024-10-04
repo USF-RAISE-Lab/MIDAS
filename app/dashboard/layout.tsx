@@ -4,7 +4,7 @@ import CaptureScreenshotButton from '../ui/CaptureScreenshotButton';
 import ToasterProvider from '@/providers/ToastProvider';
 import { SearchContextProvider } from '../context/nav-search-context-provider';
 import { Nunito } from 'next/font/google';
-import { getSession, SessionProvider } from 'next-auth/react';
+import { getSession, SessionProvider, useSession } from 'next-auth/react';
 import { FetchRiskData, FetchSchoolData } from '../api/data/downloadSchoolData';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { useEffect, useState } from 'react';
@@ -18,10 +18,23 @@ const nunito = Nunito({
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 
-  useEffect(() => {
-    loadData(1);
-  }, []);
 
+
+  const [schoolId, setSchoolid] = useState<number>(0);
+  useEffect(() => {
+
+    const getSchoolId = async () => {
+
+      const session = await getSession();
+      const schoolid = session?.user.school_id;
+
+      setSchoolid(schoolid);
+    }
+    getSchoolId();
+    loadData(schoolId);
+  }, [schoolId]);
+
+  console.log(schoolId)
 
   return (
 

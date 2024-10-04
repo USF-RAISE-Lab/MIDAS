@@ -12,21 +12,25 @@ import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
 import { SchoolGreeter } from '@/app/ui/dashboard/cards/school-greeter';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 
 
 export default function Page() {
-
-  const { data: session } = useSession();
-  const schoolid = session?.user.school_id;
 
   const midasStore = useMidasStore();
 
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
-
+  const [schoolid, setSchoolid] = useState<number>(0);
 
   useEffect(() => {
+    const getSchoolId = async () => {
+      let session = await getSession();
+      setSchoolid(session?.user.school_id);
+    }
+
+    getSchoolId()
+
     const school = midasStore.getStudentsBySchoolId(schoolid);
     console.log("Student data:", school);
 
@@ -61,7 +65,13 @@ export default function Page() {
       female: calculateRiskByDemographic(schoolData!, 'midas', 'gender', 'female'),
     },
   };
-
+  if (schoolid === 0) {
+    return (
+      <main>
+        Loading...
+      </main>
+    )
+  }
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
       <SchoolGreeter schoolId={schoolid} />

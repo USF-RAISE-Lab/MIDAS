@@ -173,6 +173,11 @@ const FileModal = () => {
 
       // Get the user session
       const session = await getSession();
+      const schoolid = session?.user.school_id;
+
+      console.log("SESSION SCHOOLID = ")
+      console.log(schoolid)
+
       if (!session) {
         toast.error('User session not found');
         return;
@@ -181,14 +186,14 @@ const FileModal = () => {
       console.log("UploadData", uploadData);
 
       // Perform the database operations (await ensures they complete before proceeding)
-      await DropRowsBySchoolId('schooldata', session.user.school_id);
+      await DropRowsBySchoolId('schooldata', schoolid);
       await InsertSchoolData(uploadData);
 
-      await DropRowsBySchoolId('schooldata_join_webinputs', session.user.school_id);
-      await JoinWebInput(session.user.school_id);
+      await DropRowsBySchoolId('schooldata_join_webinputs', schoolid);
+      await JoinWebInput(schoolid);
 
-      await DropRowsBySchoolId('schooldata_join_risk', session.user.school_id);
-      await JoinToRiskScores(session.user.school_id);
+      await DropRowsBySchoolId('schooldata_join_risk', schoolid);
+      await JoinToRiskScores(schoolid);
 
       // Update state based on the uploaded data
       updateSchoolLevelData(uploadData);
