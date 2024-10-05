@@ -212,7 +212,11 @@ const FileModal = () => {
       toast.error('Something went wrong.');
     } finally {
       setIsLoading(false);
+
+
     }
+
+    router.refresh();
   };
   // Functions to handle updating different levels
   const updateSchoolLevelData = (uploadData: any) => {

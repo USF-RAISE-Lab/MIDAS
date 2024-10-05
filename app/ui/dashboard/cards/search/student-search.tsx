@@ -30,6 +30,7 @@ import Fuse from 'fuse.js'
 import Downshift from 'downshift';
 import { StudentAutocomplete } from '@/app/ui/autocomplete';
 import { createPortal } from 'react-dom';
+import { Capitalize } from '@/action/capitalize';
 
 const nunito = Nunito({
   weight: ['200', '200'],
@@ -120,14 +121,14 @@ function DemographicsRow({
           placement="bottom"
         >
           <div className="basis-1/4">
-            <DemographicsBox label="Gender" content={content.gender} />
+            <DemographicsBox label="Gender" content={Capitalize(content.gender)} />
           </div>
         </Tooltip>
       )}
 
       {!content.gender && (
         <div className="basis-1/4">
-          <DemographicsBox label="Gender" content={content.gender} />
+          <DemographicsBox label="Gender" content={Capitalize(content.gender)} />
         </div>
       )}
 
@@ -150,14 +151,14 @@ function DemographicsRow({
           placement="bottom"
         >
           <div className="basis-1/4">
-            <DemographicsBox label="English Learner" content={content.ell} />
+            <DemographicsBox label="English Learner" content={Capitalize(content.ell)} />
           </div>
         </Tooltip>
       )}
 
       {!content.ell && (
         <div className="basis-1/4">
-          <DemographicsBox label="English Learner" content={content.ell} />
+          <DemographicsBox label="English Learner" content={Capitalize(content.ell)} />
         </div>
       )}
 
@@ -180,14 +181,14 @@ function DemographicsRow({
           placement="bottom"
         >
           <div className="basis-1/4">
-            <DemographicsBox label="Ethnicity" content={content.ethnicity} />
+            <DemographicsBox label="Ethnicity" content={Capitalize(content.ethnicity)} />
           </div>
         </Tooltip>
       )}
 
       {!content.ethnicity && (
         <div className="basis-1/4">
-          <DemographicsBox label="Ethnicity" content={content.ethnicity} />
+          <DemographicsBox label="Ethnicity" content={Capitalize(content.ethnicity)} />
         </div>
       )}
     </div>
