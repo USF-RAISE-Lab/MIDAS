@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const supabase = createClient(supabaseUrl, supabaseKey!);
 
   try {
-    const {email, username, password} = await request.json();
+    const { email, username, password } = await request.json();
     // TODO: Validation
 
     const hashedPassword = await hash(password, 10);
@@ -26,9 +26,9 @@ export async function POST(request: Request) {
     if (error) console.error(error)
     else console.log(data)
 
-  } catch(e) {
-    console.log({e});
+  } catch (e) {
+    console.log({ e });
   }
 
-  return NextResponse.json({message: "SUCCESS"});
+  return NextResponse.json({ message: "SUCCESS" });
 }
