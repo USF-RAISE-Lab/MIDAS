@@ -31,7 +31,7 @@ import { getSession } from "next-auth/react";
 
 
 const supabaseUrl = 'https://kalbwmivszjzlnepcebm.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey!);
 
 /**
@@ -41,9 +41,9 @@ export async function CompareSchoolNames(file: File) {
   const session = await getSession();
 
   let { data: isAdminData, error: isAdminError } = await supabase
-  .rpc('get_is_admin_from_username', {
-    _username: session?.user.name
-  })
+    .rpc('get_is_admin_from_username', {
+      _username: session?.user.name
+    })
   if (isAdminError) console.error(isAdminError)
   else console.log(isAdminData)
 
@@ -54,9 +54,9 @@ export async function CompareSchoolNames(file: File) {
 
   // Get the user data from current session user.name
   let { data, error } = await supabase
-  .rpc('get_school_name_from_username', {
-    _username: session?.user.name
-  })
+    .rpc('get_school_name_from_username', {
+      _username: session?.user.name
+    })
   if (error) console.error(error)
   else console.log(data)
 

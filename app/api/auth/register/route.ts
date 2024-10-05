@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
 
   const supabaseUrl = 'https://kalbwmivszjzlnepcebm.supabase.co';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY;
   const supabase = createClient(supabaseUrl, supabaseKey!);
 
   try {

@@ -8,7 +8,7 @@ import { getSession, SessionProvider, useSession } from 'next-auth/react';
 import { FetchRiskData, FetchSchoolData } from '../api/data/downloadSchoolData';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { useEffect, useState } from 'react';
-import { loadData } from '@/action/loadData';
+import { loadData } from '../api/data/loadData';
 
 const nunito = Nunito({
   weight: ['200', '300'],
