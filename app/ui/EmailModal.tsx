@@ -8,7 +8,6 @@ import { EmailFormat } from '@/types';
 
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { postData } from '../lib/helpers';
 
 const EmailModal = () => {
   const [content, setContent] = React.useState<string>('');
@@ -61,7 +60,7 @@ const EmailModal = () => {
             },
           }),
         });
-  
+
         if (!response.ok) {
           const errorData = await response.json();
           console.error('Error:', errorData);

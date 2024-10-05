@@ -1,3 +1,4 @@
+
 /**
  * @since 2024-08-27
  * @author Gabriel
@@ -7,6 +8,7 @@ import clsx from 'clsx';
 import React, { Fragment, ReactElement } from 'react';
 import { Card, CardHeader, Tooltip, Divider } from '@nextui-org/react';
 import { Nunito } from 'next/font/google';
+import { ConfidenceIntervalVisualizer } from './confidence-visualizer';
 import { Capitalize } from '@/action/capitalize';
 const nunito = Nunito({
   weight: ['200', '200'],
@@ -81,15 +83,34 @@ function Row({
  * @param  title The title of the card.
  * @param  assessments The contents of a row. Contains name, values, labels, and tooltipText.
  */
-export function RiskCard({
+export function RiskCardWithConfidence({
   title,
   assessments,
+  confidence,
   className
 }: {
   title: string;
   assessments: Assessment[];
+  confidence: string;
   className?: string;
 }): React.ReactElement {
+  const calculateConfidenceNumber = () => {
+    if (confidence === "low") {
+      return 1;
+    }
+    else if (confidence === "some") {
+      return 50;
+    }
+    else if (confidence === "high") {
+      return 100;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  const confidenceNumber = calculateConfidenceNumber();
+
   return (
     <Card className={`${nunito.className} items-center justify-center rounded-xl bg-neutral-50 pb-2 ${className}`}>
       <CardHeader className="">
@@ -101,12 +122,17 @@ export function RiskCard({
           return (
             <Fragment key={index}>
               <Tooltip content={assessment.tooltipContent} placement="bottom" className='max-w-[32rem]'>
-                <div className='flex'>
+                <div className='flex flex-col items-center'>
                   <Row
                     title={assessment.name}
                     values={assessment.values}
                     labels={assessment.labels}
                   />
+                  <div className="flex flex-row -mt-6 items-center">
+
+                    <p className="text-sm italic">Confidence: </p>
+                    <ConfidenceIntervalVisualizer confidence={confidenceNumber} thresholds={[0, 40, 90]} className="" />
+                  </div>
                 </div>
               </Tooltip>
               {index < assessments.length - 1 && (

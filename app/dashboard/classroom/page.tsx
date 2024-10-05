@@ -1,150 +1,98 @@
+// classroom/page.tsx
+
 'use client';
 
-import { SaebrsSummary } from '@/app/ui/dashboard/cards/population/saebrs-summary';
-import { CardDisciplinarySummary } from '@/app/ui/dashboard/cards/population/disciplinary-summary';
-import { CardTestScoreSummary } from '@/app/ui/dashboard/cards/population/test-scores-summary';
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';
-import { useState } from 'react';
-import { CardThreeValue } from '@/app/ui/dashboard/cards/general/card-three-value';
-import useRiskOptions from '@/hooks/useRiskOptions';
-import useClassLevel from '@/hooks/useClassLevel';
-import { useSearchContext } from '@/app/context/nav-search-context';
+import { useEffect, useState } from 'react';
 import { Card } from '@nextui-org/react';
-import { ethnicity, genders, ell } from '@/constants/constants';
-import ClassSearch from '@/app/ui/dashboard/cards/search/class-search-card';
-import ClassSearchInputOnly from '@/app/ui/dashboard/cards/search/class-search-input';
-import useSchoolLevel from '@/hooks/useSchoolLevel';
 import MyBarChart from '@/app/ui/charts/bar-chart';
-import { getClassRiskValues, getSchoolRiskValues } from '@/app/lib/get-risk-values';
-import { ChartGroup } from '@/app/ui/charts/chart-group';
 import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
+import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
+import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
+import ClassSearch from '@/app/ui/dashboard/cards/search/class-search-card';
+import { GetClassroomOptions } from '@/action/getClassroomOptions';
+import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
+import { useSession } from 'next-auth/react';
+import { SearchContext } from '@/app/context/nav-search-context';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-function MidasRiskTooltipContent() {
-  return (
-    <div>Percentages of students at the three different MIDAS risk levels.</div>
-  );
-}
 
 export default function Page() {
-  const [genderState, setGenderState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
-  const [ethnicityState, setEthnicityState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
+  const { data: session } = useSession();
+  const schoolid = session?.user.school_id;
 
-  const [ellState, setEllState] = useState({
-    math_risk: false,
-    read_risk: false,
-    susp_risk: false,
-  });
-  const riskOptions = useRiskOptions();
-  const classLevel = useClassLevel();
-  console.log(classLevel);
-  const classroom = useSearchContext('classroom');
-  const selectedClass = classroom.get;
+  const midasStore = useMidasStore();
 
-  const [midasRisk, setMidasRisk] = useState({
-    low: '45%',
-    some: '40%',
-    high: '15%',
-  });
+  const [classData, setClassData] = useState<SchoolData[]>([]);
+  const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
-  const [disciplineRisk, setDisciplineRisk] = useState({
-    odrZero: '77%',
-    odrSome: '23%',
-    suspZero: '80%',
-    suspSome: '20%',
-  });
+  const searchParams = useSearchParams();
+  const classSearchParam = searchParams.get("classroom");
 
-  // ASK SONJA WHAT THE VALUES FOR TEST RISK ARE
-  const [testRisk, setTestRisk] = useState({});
+  const [selectedClass, setSelectedClass] = useState<string>(classSearchParam !== undefined ? classSearchParam! : schoolData.map(student => student.classroom)[0]);
 
-  const [saebrsRisk, setSaebrsRisk] = useState({
-    saebrsTotal: ['60%', '25%', '15%'],
-    mySaebrsTotal: ['54%', '33%', '13%'],
-    saebrsEmotional: ['59%', '33%', '8%'],
-    mySaebrsEmotional: ['50%', '37%', '13%'],
-    saebrsSocial: ['40%', '41%', '19%'],
-    mySaebrsSocial: ['40%', '39%', '17%'],
-    saebrsAcademic: ['72%', '16%', '12%'],
-    mySaebrsAcademic: ['70%', '18%', '12%'],
-  });
+  useEffect(() => {
+    const classroom = midasStore.getStudentsByClassroom(schoolid, selectedClass);
+    const school = midasStore.getStudentsBySchoolId(schoolid);
 
-  const getCurrentState = (states: any) => {
-    const arr = Object.keys(states).filter((state: any) => {
-      if (states[state]) return state;
-    });
+    setSchoolData(school)
+    setClassData(classroom);
+  }, [midasStore, selectedClass, schoolid]);
 
-    if (arr) return arr[0];
-    return undefined;
+  const dashboardData: DashboardData = {
+    midasRiskPercentages: calculateRiskPercentages(classData!, 'midas'),
+    teacherRiskPercentages: calculateRiskPercentages(classData!, 'teacher'),
+    studentRiskPercentages: calculateRiskPercentages(classData!, 'student'),
+
+    midasConfidence: calculateModeConfidence(classData!, 'midas'), // example value
+
+    odrPercentages: calculateOccurancePercentages(classData!, 'odr_f'),
+    suspPercentages: calculateOccurancePercentages(classData!, 'susp_f'),
+
+    mathPercentages: calculateTestRiskPercentages(classData!, 'math_f'),
+    readPercentages: calculateTestRiskPercentages(classData!, 'read_f'),
+
+    ethnicityRiskPercentages: {
+      white: calculateRiskByDemographic(classData!, 'midas', 'ethnicity', 'white'),
+      hispanic: calculateRiskByDemographic(classData!, 'midas', 'ethnicity', 'hispanic'),
+      other: calculateRiskByDemographic(classData!, 'midas', 'ethnicity', 'other poc'),
+    },
+    ellRiskPercentages: {
+      ell: calculateRiskByDemographic(classData!, 'midas', 'ell', 'yes'),
+      nonEll: calculateRiskByDemographic(classData!, 'midas', 'ell', 'no'),
+    },
+    genderRiskPercentages: {
+      male: calculateRiskByDemographic(classData!, 'midas', 'gender', 'male'),
+      female: calculateRiskByDemographic(classData!, 'midas', 'gender', 'female'),
+    },
   };
 
-  const genderRisk = getCurrentState(genderState);
-  const ellRisk = getCurrentState(ellState);
-  const ethRisk = getCurrentState(ethnicityState);
-
-  const schoolLevel = useSchoolLevel();
-  if (schoolLevel.listOfAllStudents === undefined) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2">
-        <div>Please upload all of the data files first.</div>
-      </div>
-    );
-  }
-
-  // Stops proceeding to dashboard before selecting a classroom level
-  if (!selectedClass) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2">
-        <div>Please enter a classroom ID to view the dashboard.</div>
-        <div className="w-1/4">
-          <ClassSearchInputOnly
-            selectedClass={selectedClass}
-            setSelectedClass={classroom.set}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // BUG - There should be a function that checks all variables because what if mySaebrsAcademic is just NA in the dataset?
-  if (classLevel.mySaebrsAcademic[selectedClass] === undefined) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <div>
-          The class is not available and please enter a different class to view
-          the dashboard.
-        </div>
-      </div>
-    );
-  }
+  console.log("CONFIDENCE")
+  console.log(dashboardData.midasConfidence)
 
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
-      {/* Row 1 */}
+      <ClassSearch
+        selectedClass={selectedClass}
+        setSelectedClass={setSelectedClass}
+        classList={GetClassroomOptions(schoolData)}
+        studentList={classData.map(student => student.studentid)}
+      />
 
-      <RiskCard
+      {/* Row 1 */}
+      <RiskCardWithConfidence
         title={'MIDAS Main Risk'}
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.midasRiskPercentages.low, dashboardData.midasRiskPercentages.some, dashboardData.midasRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: MidasRiskScoreTooltip()
           },
         ]}
-        className=''
-      />
-      <CardConfidenceVisualizer
-        missingVariables={0}
-        confidence={3}
-        confidenceThresholds={[1, 2, 3, 4, 5]}
+
+        confidence={dashboardData.midasConfidence!}
         className=''
       />
       <RiskCard
@@ -152,7 +100,7 @@ export default function Page() {
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.studentRiskPercentages.low, dashboardData.studentRiskPercentages.some, dashboardData.studentRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'Sub risk'
           },
@@ -164,7 +112,7 @@ export default function Page() {
         assessments={[
           {
             name: '',
-            values: ['33%', '33%', '33%'],
+            values: [dashboardData.teacherRiskPercentages.low, dashboardData.teacherRiskPercentages.some, dashboardData.teacherRiskPercentages.high],
             labels: ['Low', 'Some', 'High'],
             tooltipContent: 'Sub risk'
           },
@@ -178,13 +126,13 @@ export default function Page() {
         assessments={[
           {
             name: 'ODR',
-            values: ['33%', '33%'],
+            values: [dashboardData.odrPercentages.zero, dashboardData.odrPercentages.oneplus],
             labels: ['Zero', 'One +'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Suspensions',
-            values: ['33%', '33%'],
+            values: [dashboardData.suspPercentages.zero, dashboardData.suspPercentages.oneplus],
             labels: ['Zero', 'One +'],
             tooltipContent: 'Suspensions'
           }
@@ -197,25 +145,18 @@ export default function Page() {
         assessments={[
           {
             name: 'Math',
-            values: ['33%', '33%'],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            labels: ['Low', 'Some', 'High'],
             tooltipContent: 'ODR'
           },
           {
             name: 'Reading',
-            values: ['33%', '33%'],
-            labels: ['Zero', 'One +'],
+            values: [dashboardData.mathPercentages.low, dashboardData.mathPercentages.some, dashboardData.mathPercentages.high],
+            labels: ['Low', 'Some', 'High'],
             tooltipContent: ''
           }
         ]}
-        className='lg:row-span-2 lg:order-9'
-      />
-
-      <ClassSearch
-        selectedClass={selectedClass}
-        setSelectedClass={classroom.set}
-        studentList={['6A_129', '6A_251', '6B_151', '6H_194']}
-        className='lg:order-last order-first max-lg:col-span-full'
+        className='lg:row-span-2 lg:order-last'
       />
 
       <Card
@@ -226,15 +167,10 @@ export default function Page() {
           Ethnicity and Risk
         </p>
         <p className="-mb-8 mt-6 pl-2 text-sm italic">
-          Distribution of those at risk for each ethnicity
+          Distribution of risk for each ethnicity
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10 ">
-          <MyBarChart data={Object.keys(ethnicity).map((ele: any) => ({
-            label: ele,
-            highRisk: ethnicity[ele]['High Risk'],
-            someRisk: ethnicity[ele]['Some Risk'],
-            lowRisk: ethnicity[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.ethnicityRiskPercentages} />
         </div>
       </Card>
 
@@ -246,15 +182,10 @@ export default function Page() {
           English Learner and Risk
         </p>
         <p className="-mb-8 mt-6 pl-2 text-sm italic">
-          Distribution of those at risk for English learners and speakers
+          Distribution of risk for English fluency status
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-          <MyBarChart data={Object.keys(ell).map((ele: any) => ({
-            label: ele,
-            highRisk: ell[ele]['High Risk'],
-            someRisk: ell[ele]['Some Risk'],
-            lowRisk: ell[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.ellRiskPercentages} />
         </div>
       </Card>
 
@@ -264,18 +195,12 @@ export default function Page() {
       >
         <p className="-mb-8 p-2 text-xl font-bold">Gender and Risk</p>
         <p className="-mb-8 mt-6 pl-2 text-sm italic">
-          Distribution of those at risk for each gender
+          Distribution of risk for each gender
         </p>
         <div className="mb-0 mt-auto flex h-full flex-col pt-10">
-          <MyBarChart data={Object.keys(genders).map((ele: any) => ({
-            label: ele,
-            highRisk: genders[ele]['High Risk'],
-            someRisk: genders[ele]['Some Risk'],
-            lowRisk: genders[ele]['Low Risk'],
-          }))} />
+          <MyBarChart data={dashboardData.genderRiskPercentages} />
         </div>
       </Card>
     </main>
-
   );
 }

@@ -1,19 +1,17 @@
+// student/page.ts
+
 'use client';
 
-import { CardMidasRisk } from '@/app/ui/dashboard/cards/individual/midas-summary';
-import { SaebrsSummary } from '@/app/ui/dashboard/cards/individual/saebrs-summary';
-import StudentSearch from '../../ui/dashboard/cards/search/student-search';
-import { useEffect, useState } from 'react';
-import useSchoolLevel from '@/hooks/useSchoolLevel';
-import { useSearchContext } from '@/app/context/nav-search-context';
-import { CardStudentDiscipline } from '@/app/ui/dashboard/cards/individual/disciplinary';
-import { CardStudentTestScores } from '@/app/ui/dashboard/cards/individual/test-scores';
+import { SetStateAction, useEffect, useState } from 'react';
 import { CardConfidenceVisualizer } from '@/app/ui/dashboard/cards/general/card-confidence';
-import { nunito } from '@/app/ui/fonts';
-import { Button } from '@/app/ui/button';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
-import { postData } from '@/app/lib/helpers';
-import { writeFile } from 'xlsx';
+import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
+import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskByDemographic, calculateRiskPercentages, calculateTestRiskPercentages } from '@/action/calculateRiskStatistics';
+import { RiskCard } from '@/app/ui/dashboard/risk-card';
+import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
+import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
+import { StudentSearch } from '@/app/ui/dashboard/cards/search/student-search';
+import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 
 interface SearchProps {
   searchParams: {
@@ -21,207 +19,180 @@ interface SearchProps {
   };
 }
 
-export default function Page({ searchParams }: SearchProps) {
-  const schoolLevel = useSchoolLevel();
-  const stateStudent = useSearchContext('student');
-  const setSelectedStudent = stateStudent.set;
-  const selectedStudent = stateStudent.get;
+export default function Page() {
 
-  const searchData = () => {
-    const result = schoolLevel?.listOfAllStudents?.filter(
-      (student: any) => student.studentid === selectedStudent,
-    );
+  const { data: session } = useSession();
+  const schoolid = session?.user.school_id;
 
-    if (result?.length > 0) return result[0];
+  const midasStore = useMidasStore();
 
-    return '';
-  };
 
-  const computeConfidenceForEachStudent = (data: any) => {
-    let confidence: number = 0;
-    if (data) {
-      confidence = Math.round(
-        (data?.math_confidence +
-          data?.susp_confidence +
-          data?.read_confidence +
-          data?.odr_confidence) /
-          4,
-      );
-    }
-    return confidence;
-  };
+  const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
+  const [studentData, setStudentData] = useState<SchoolData[]>([]);
 
-  const data: any = searchData();
-
-  let confidence: number = computeConfidenceForEachStudent(data);
-
-  const [saebrsScores, setSaebrsScores] = useState({
-    saebrsTotal: 'NA',
-    mySaebrsTotal: 'NA',
-    saebrsEmotional: 'NA',
-    mySaebrsEmotional: 'NA',
-    saebrsSocial: 'NA',
-    mySaebrsSocial: 'NA',
-    saebrsAcademic: 'NA',
-    mySaebrsAcademic: 'NA',
-  });
-
-  const [midasSummary, setMidasSummary] = useState({
-    midasRisk: 'NA',
-    missingVariables: 1,
-    confidence: 0,
-    confidenceThreshold: [1, 2, 3, 4, 5],
-  });
-
-  const [identification, setIdentification] = useState({
-    studentId: data?.studentid ?? 'NA',
-    grade: data?.gradelevel ?? 'NA',
-    classroomId: data?.classroom ?? 'NA',
-  });
-
-  const [demographics, setDemographics] = useState({
-    gender: data?.gender ?? 'NA',
-    ethnicity: data?.ethnicity ?? 'NA',
-    englishLearner: data?.ell ?? 'NA',
-  });
-
-  const [testScoreRisk, setTestScoreRisk] = useState({
-    math: data?.math_risk ?? 'NA',
-    reading: data?.reading_risk ?? 'NA',
-    suspension: 'NA',
-    odr: 'NA',
-  });
+  const searchParams = useSearchParams();
+  const studentSearchParam = searchParams.get("student");
+  const [studentId, setStudentId] = useState<string | undefined>(studentSearchParam!);
 
   useEffect(() => {
-    setDemographics({
-      gender: data?.gender ?? 'NA',
-      ethnicity: data?.ethnicity ?? 'NA',
-      englishLearner: data?.ell ?? 'NA',
-    });
+    if (false) {
+      console.log("studentId is not set yet");
+      setStudentId(schoolData.map(student => student.studentid)[0]);
+      console.log(studentId);
+    }
+    const school = midasStore.getStudentsBySchoolId(schoolid);
 
-    setIdentification({
-      studentId: data?.studentid ?? 'NA',
-      grade: data?.gradelevel ?? 'NA',
-      classroomId: data?.classroom ?? 'NA',
-    });
+    // todo)) This may cause a bug if there is a user with no associated data at all
+    const student = midasStore.getStudentById(schoolid, studentId!)
+    console.log("Individual Student data:", school);
 
-    setSaebrsScores({
-      saebrsTotal: 'NA',
-      mySaebrsTotal: 'NA',
-      saebrsEmotional: data?.saebrs_emo,
-      mySaebrsEmotional: data?.mysaebrs_emo,
-      saebrsSocial: data?.saebrs_soc,
-      mySaebrsSocial: data?.mysaebrs_soc,
-      saebrsAcademic: data?.saebrs_aca,
-      mySaebrsAcademic: data?.mysaebrs_aca,
-    });
+    setSchoolData(school);
+    setStudentData(student);
+  }, [midasStore, studentId, schoolid]);
 
-    setTestScoreRisk({
-      math: data?.math_risk ?? 'NONE',
-      reading: data?.read_risk ?? 'NONE',
-      suspension: data?.susp_risk ?? 'NONE',
-      odr: data?.odr_risk ?? 'NONE',
-    });
+  // todo)) This is hacky and should be done differently, but it works for now.
+  if (studentData[0] === undefined) {
+    studentData[0] = {
+      classroom: "",
+      ell: "",
+      ethnicity: "",
+      gender: "",
+      gradelevel: 0,
+      math_f: "",
+      mysaebrs_aca: "",
+      mysaebrs_soc: "",
+      mysaebrs_emo: "",
+      odr_f: "",
+      read_f: "",
+      risk: {
+        midas: {
+          risklevel: "",
+          confidence: ""
+        },
+        teacher: {
+          risklevel: "",
+          confidence: ""
+        },
+        student: {
+          risklevel: "",
+          confidence: ""
+        }
+      },
+      saebrs_aca: "",
+      saebrs_emo: "",
+      saebrs_soc: "",
+      school_id: 1,
+      schoollevel: "",
+      studentid: "",
+      susp_f: ""
+    }
+  }
+  const student = studentData[0];
 
-    setMidasSummary({
-      midasRisk: 'NA',
-      missingVariables: 1,
-      confidence:
-        Math.round(
-          (data?.math_confidence +
-            data?.read_confidence +
-            data?.susp_confidence) /
-            3,
-        ) ?? 0,
-      confidenceThreshold: [1, 2, 3, 4, 5],
-    });
-  }, [data]);
-
-  //handle export feature
-  const handleExport = async (listStudents: any) => {
-    const result = await postData({
-      url: 'https://midas-topaz.vercel.app/api/export',
-      data: { listStudents },
-    });
-    const res = writeFile(result, 'students.xlsx', {
-      compression: true,
-      type: 'file',
-    });
+  const dashboardData: StudentDashboardData = {
+    midasRiskLabel: student?.risk.midas?.risklevel || "NA",
+    teacherRiskLabel: student?.risk.teacher?.risklevel || "NA",
+    studentRiskLabel: student?.risk.student?.risklevel || "NA",
+    midasConfidence: student?.risk.midas?.confidence || "NA",
+    odrLabel: student?.odr_f || "NA",
+    suspLabel: student?.susp_f || "NA",
+    ethnicity: student?.ethnicity || "NA",
+    ell: student?.ell || "NA",
+    gender: student?.gender || "NA",
+    mathLabel: student?.math_f || "NA",
+    readLabel: student?.read_f || "NA"
   };
+
   return (
-    <main className='flex flex-col gap-2 m-2'>
-      <div className='flex flex-col lg:flex-row gap-1'>
-        <StudentSearch
-          selectedStudent={selectedStudent}
-          setSelectedStudent={setSelectedStudent}
-          data={data}
-          className='lg:basis-1/3'
+    <main className="flex flex-col md:w-[70%] p-4 gap-4 mx-auto">
+      <StudentSearch selectedStudent={studentId!} setSelectedStudent={setStudentId}
+        data={{ gradeLevel: student.gradelevel.toString(), gender: student.gender, ethnicity: student.ethnicity, ell: student.ell }}
+        studentList={schoolData.map(student => student.studentid)} />
+
+      <div className="flex md:flex-row flex-col gap-4 md:justify-evenly w-full">
+        <RiskCardWithConfidence
+          title={'MIDAS Main Risk'}
+          assessments={[
+            {
+              name: '',
+              values: [dashboardData.midasRiskLabel],
+              labels: [],
+              tooltipContent: MidasRiskScoreTooltip()
+            },
+          ]}
+          confidence={dashboardData.midasConfidence!}
+          className="max-h-64 w-full"
         />
 
-        <div className='flex lg:hidden flex-row gap-1'>
-          <CardMidasRisk 
-            midasRisk={midasSummary.midasRisk} 
-            className='basis-1/2'
-          />
-          <CardConfidenceVisualizer
-            confidence={3}
-            confidenceThresholds={[1, 2, 3, 4, 5]}
-            missingVariables={0}
-            className='basis-1/2 '
-          />
-        </div>
 
-        <div className='flex flex-col lg:flex-row gap-1 lg:basis-2/3'>
-          <CardStudentDiscipline
-            odr={testScoreRisk.odr}
-            suspensions={testScoreRisk.suspension}
-          />
-          <CardStudentTestScores
-            math={testScoreRisk.math}
-            reading={testScoreRisk.reading}
-          />
-        </div>
-      </div>
-      
-      
-
-      <div className='flex flex-row gap-1 h-[29vh]'>
-        <div className='hidden lg:flex flex-col gap-1 basis-1/4 '>
-          <CardMidasRisk 
-            midasRisk={midasSummary.midasRisk} 
-            className='h-full'
-          />
-          <CardConfidenceVisualizer
-            confidence={3}
-            confidenceThresholds={[1, 2, 3, 4, 5]}
-            missingVariables={0}
-            className=''
-          />
-        </div>
-
-        <div className='lg:basis-3/4 w-full'>
-          <SaebrsSummary
-            saebrsTotal={saebrsScores.saebrsTotal}
-            mySaebrsTotal={saebrsScores.mySaebrsTotal}
-            saebrsEmotional={saebrsScores.saebrsEmotional}
-            mySaebrsEmotional={saebrsScores.mySaebrsEmotional}
-            saebrsSocial={saebrsScores.saebrsSocial}
-            mySaebrsSocial={saebrsScores.mySaebrsSocial}
-            saebrsAcademic={saebrsScores.saebrsAcademic}
-            mySaebrsAcademic={saebrsScores.mySaebrsAcademic}
-            className='gap-1 h-full'
-            className_card='min-h-[28vh]'
-          />
-        </div>
-        
+        <RiskCard
+          title={'Teacher Sub-Risk'}
+          assessments={[
+            {
+              name: '',
+              values: [dashboardData.teacherRiskLabel],
+              labels: [],
+              tooltipContent: 'Sub risk'
+            },
+          ]}
+          className="w-full"
+        />
+        <RiskCard
+          title={'Student Sub-Risk'}
+          assessments={[
+            {
+              name: '',
+              values: [dashboardData.studentRiskLabel],
+              labels: [],
+              tooltipContent: 'Sub risk'
+            },
+          ]}
+          className="w-full"
+        />
       </div>
 
-      <div className="invisible lg:visible z-10 absolute bottom-10 right-28 opacity-75">
-        <Button className="bg-[#1e8434] hover:bg-[#1e8434a1]" onClick={() => handleExport(schoolLevel?.listOfAllStudents)}>
-          <ArrowDownTrayIcon className="w-6 pr-2" />
-          <p>Export</p>
-        </Button>
+      {/* Row 2 */}
+      <div className="flex lg:flex-row flex-col gap-4 justify-evenly">
+        <RiskCard
+          title={'Discipline Summary'}
+          assessments={[
+            {
+              name: 'ODR',
+              values: [dashboardData.odrLabel],
+              labels: [],
+              tooltipContent: 'ODR'
+            },
+            {
+              name: 'Suspensions',
+              values: [dashboardData.suspLabel],
+              labels: [],
+              tooltipContent: 'Suspensions'
+            }
+          ]}
+          className="w-full"
+        />
+
+        <RiskCard
+          title={'Test Risk Scores'}
+          assessments={[
+            {
+              name: 'Math',
+              values: [dashboardData.mathLabel],
+              labels: [],
+              tooltipContent: 'ODR'
+            },
+            {
+              name: 'Reading',
+              values: [dashboardData.readLabel],
+              labels: [],
+              tooltipContent: ''
+            }
+          ]}
+          className="w-full"
+        />
       </div>
-    </main>
+
+    </main >
+
   );
 }

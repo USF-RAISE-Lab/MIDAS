@@ -24,7 +24,14 @@ export const stackedBarOptions: ChartOptions<'bar'> = {
     datalabels: {
       color: "#404040",
       formatter: function (value) {
-        return value * 100 + '%';
+
+        // Hide the label if it is less than 2.5%
+        if (value < 0.025) {
+          return null;
+        } 
+        else {
+          return (value * 100).toFixed(1) + '%';
+        }
       },
       font: {
         weight: 'lighter',

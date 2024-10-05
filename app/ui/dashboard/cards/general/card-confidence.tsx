@@ -144,7 +144,7 @@ export function CardConfidenceVisualizer({
   missingVariables,
   className
 }: {
-  confidence: number;
+  confidence: string;
   confidenceThresholds: number[];
   missingVariables: number;
   className?: string;
@@ -166,9 +166,9 @@ export function CardConfidenceVisualizer({
 
           <CardBody className="-mb-4 -mt-4 w-full px-4">
             <div className="flex flex-col items-center pb-4">
-              <p className="text-3xl"> {(confidence / 5) * 100 + '%'} </p>
+              <p className="text-3xl"> {confidence} </p>
               <ConfidenceIntervalVisualizer
-                confidence={confidence}
+                confidence={5}
                 thresholds={confidenceThresholds}
               />
             </div>
