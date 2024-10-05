@@ -11,6 +11,7 @@ import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
 import { StudentSearch } from '@/app/ui/dashboard/cards/search/student-search';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 
 interface SearchProps {
   searchParams: {
@@ -18,7 +19,7 @@ interface SearchProps {
   };
 }
 
-export default function Page({ searchParams }: SearchProps) {
+export default function Page() {
 
   const { data: session } = useSession();
   const schoolid = session?.user.school_id;
@@ -29,7 +30,9 @@ export default function Page({ searchParams }: SearchProps) {
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
   const [studentData, setStudentData] = useState<SchoolData[]>([]);
 
-  const [studentId, setStudentId] = useState<string | undefined>();
+  const searchParams = useSearchParams();
+  const studentSearchParam = searchParams.get("student");
+  const [studentId, setStudentId] = useState<string | undefined>(studentSearchParam!);
 
   useEffect(() => {
     if (!studentId) {
@@ -116,6 +119,7 @@ export default function Page({ searchParams }: SearchProps) {
               tooltipContent: MidasRiskScoreTooltip()
             },
           ]}
+          confidence={dashboardData.midasConfidence!}
           className="max-h-64 w-full"
         />
 

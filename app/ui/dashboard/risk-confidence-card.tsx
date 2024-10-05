@@ -86,12 +86,31 @@ function Row({
 export function RiskCardWithConfidence({
   title,
   assessments,
+  confidence,
   className
 }: {
   title: string;
   assessments: Assessment[];
+  confidence: string;
   className?: string;
 }): React.ReactElement {
+  const calculateConfidenceNumber = () => {
+    if (confidence === "low") {
+      return 1;
+    }
+    else if (confidence === "some") {
+      return 50;
+    }
+    else if (confidence === "high") {
+      return 100;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  const confidenceNumber = calculateConfidenceNumber();
+
   return (
     <Card className={`${nunito.className} items-center justify-center rounded-xl bg-neutral-50 pb-2 ${className}`}>
       <CardHeader className="">
@@ -112,7 +131,7 @@ export function RiskCardWithConfidence({
                   <div className="flex flex-row -mt-6 items-center">
 
                     <p className="text-sm italic">Confidence: </p>
-                    <ConfidenceIntervalVisualizer confidence={50} thresholds={[0, 50, 90]} className="" />
+                    <ConfidenceIntervalVisualizer confidence={confidenceNumber} thresholds={[0, 40, 90]} className="" />
                   </div>
                 </div>
               </Tooltip>

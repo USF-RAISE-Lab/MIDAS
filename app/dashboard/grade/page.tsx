@@ -68,6 +68,8 @@ export default function Page() {
     },
   };
 
+  console.log("CONFIDENCE")
+  console.log(dashboardData.midasConfidence)
 
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
@@ -84,6 +86,7 @@ export default function Page() {
             tooltipContent: MidasRiskScoreTooltip()
           },
         ]}
+        confidence={dashboardData.midasConfidence!}
         className=''
       />
       <RiskCard

@@ -16,7 +16,8 @@ function Square({ color }: { color: string }) {
 const colors = [
   ['red', 'gray', 'gray', 'gray', 'gray'],
   ['red', 'red', 'gray', 'gray', 'gray'],
-  ['yellow', 'yellow', 'yellow', 'gray', 'gray'],
+  ['yellow', 'yellow', 'gray', 'gray', 'gray'],
+  //['yellow', 'yellow', 'yellow', 'gray', 'gray'],
   ['green', 'green', 'green', 'green', 'gray'],
   ['green', 'green', 'green', 'green', 'green'],
 ];
@@ -38,12 +39,8 @@ export function ConfidenceIntervalVisualizer({
   const colorList: ColorSelectionInterface = (confidence) => {
     if (confidence <= thresholds[0]) {
       return colors[0];
-    } else if (confidence === thresholds[1]) {
-      return colors[1];
-    } else if (confidence === thresholds[2]) {
+    } else if (confidence > thresholds[0] && confidence <= thresholds[1]) {
       return colors[2];
-    } else if (confidence === thresholds[0]) {
-      return colors[3];
     } else {
       return colors[4];
     }
@@ -54,8 +51,6 @@ export function ConfidenceIntervalVisualizer({
       <Square color={colorList(confidence)[0]} />
       <Square color={colorList(confidence)[1]} />
       <Square color={colorList(confidence)[2]} />
-      <Square color={colorList(confidence)[3]} />
-      <Square color={colorList(confidence)[4]} />
     </div>
   );
 }

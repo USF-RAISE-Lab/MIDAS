@@ -14,6 +14,8 @@ import ClassSearch from '@/app/ui/dashboard/cards/search/class-search-card';
 import { GetClassroomOptions } from '@/action/getClassroomOptions';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
 import { useSession } from 'next-auth/react';
+import { SearchContext } from '@/app/context/nav-search-context';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
 export default function Page() {
@@ -25,7 +27,10 @@ export default function Page() {
   const [classData, setClassData] = useState<SchoolData[]>([]);
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
 
-  const [selectedClass, setSelectedClass] = useState<string>(schoolData.map(student => student.classroom)[0]);
+  const searchParams = useSearchParams();
+  const classSearchParam = searchParams.get("classroom");
+
+  const [selectedClass, setSelectedClass] = useState<string>(classSearchParam !== undefined ? classSearchParam! : schoolData.map(student => student.classroom)[0]);
 
   useEffect(() => {
     const classroom = midasStore.getStudentsByClassroom(schoolid, selectedClass);
@@ -62,13 +67,17 @@ export default function Page() {
       female: calculateRiskByDemographic(classData!, 'midas', 'gender', 'female'),
     },
   };
+
+  console.log("CONFIDENCE")
+  console.log(dashboardData.midasConfidence)
+
   return (
     <main className='lg:max-h-[90vh] grid max-md:grid-cols-1 max-md:grid-rows-none max-lg:grid-cols-2 lg:grid-cols-4 max-lg:grid-rows-1 lg:grid-rows-6 gap-4'>
       <ClassSearch
         selectedClass={selectedClass}
         setSelectedClass={setSelectedClass}
         classList={GetClassroomOptions(schoolData)}
-        studentList={schoolData.map(student => student.studentid)}
+        studentList={classData.map(student => student.studentid)}
       />
 
       {/* Row 1 */}
@@ -82,6 +91,8 @@ export default function Page() {
             tooltipContent: MidasRiskScoreTooltip()
           },
         ]}
+
+        confidence={dashboardData.midasConfidence!}
         className=''
       />
       <RiskCard

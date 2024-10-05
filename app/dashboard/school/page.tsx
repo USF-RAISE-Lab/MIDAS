@@ -87,6 +87,7 @@ export default function Page() {
             tooltipContent: MidasRiskScoreTooltip()
           },
         ]}
+        confidence={dashboardData.midasConfidence!}
         className=''
       />
       <RiskCard
