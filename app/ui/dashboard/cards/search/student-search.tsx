@@ -14,6 +14,7 @@ import {
   DropdownItem,
   Autocomplete,
   AutocompleteItem,
+  Link,
 } from '@nextui-org/react';
 import { useInfiniteScroll } from "@nextui-org/use-infinite-scroll";
 
@@ -24,10 +25,11 @@ import { StudentDemographics } from '@/app/types/student-demographics';
 import { FormError } from '@/app/ui/form-error';
 import { DemographicsType } from '@/app/ui/charts/demographics-type';
 import useSchoolLevel from '@/hooks/useSchoolLevel';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Fuse from 'fuse.js'
 import Downshift from 'downshift';
 import { StudentAutocomplete } from '@/app/ui/autocomplete';
+import { createPortal } from 'react-dom';
 
 const nunito = Nunito({
   weight: ['200', '200'],
@@ -192,10 +194,119 @@ function DemographicsRow({
   );
 }
 
+
+const PaginatedDropdown = ({ itemsPerPage, allItems, setSelectedStudent }: { itemsPerPage: number, allItems: any, setSelectedStudent: React.Dispatch<React.SetStateAction<string | undefined>> }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginatedItems, setPaginatedItems] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const totalPages = allItems.length / itemsPerPage;
+  useEffect(() => {
+    // Calculate the items to display based on the current page
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setPaginatedItems(allItems.slice(startIndex, endIndex));
+  }, [currentPage, allItems, itemsPerPage]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleClickOutside = (event: any) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+      buttonRef.current && !buttonRef.current.contains(event.target)) {
+      setIsDropdownOpen(false); // Close dropdown if click is outside both button and dropdown
+    }
+  };
+
+  useEffect(() => {
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
+  const toggleDropdown = (e: any) => {
+    if (!isDropdownOpen) {
+      const rect = buttonRef.current!.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+      });
+    }
+    setIsDropdownOpen(!isDropdownOpen); // Toggle dropdown open/close
+  };
+
+  const dropdownContent = (
+    <div
+      ref={dropdownRef}
+      className="absolute w-48 bg-white border shadow-lg z-50"
+      style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
+    >
+      <ul>
+        {paginatedItems.map((item, index) => (
+          <li
+            key={index}
+            className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+            onClick={() => {
+              setSelectedStudent(item);
+              setIsDropdownOpen(false); // Close dropdown after selecting
+            }}
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+
+      <div className="flex justify-between px-4 py-2">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-2 py-1 ${currentPage === 1 ? 'text-gray-400' : 'text-blue-500'}`}
+        >
+          Previous
+        </button>
+        <span>Page {currentPage}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-2 py-1 ${currentPage === totalPages ? 'text-gray-400' : 'text-blue-500'}`}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <button
+        ref={buttonRef}
+        onClick={toggleDropdown}
+        className="px-4 py-2 bg-zinc-200 text-slate-900 rounded text-nowrap"
+      >
+        List Students
+      </button>
+
+      {isDropdownOpen && createPortal(dropdownContent, document.body)}
+    </div>
+  );
+};
+
 export function StudentSearch({
   selectedStudent,
   setSelectedStudent,
   data,
+  studentList,
   className
 }: {
   selectedStudent: string;
@@ -206,6 +317,7 @@ export function StudentSearch({
     gender: string;
     ell: string;
   };
+  studentList: string[];
   className?: string;
 }) {
   const SearchAction = async (formData: FormData) => {
@@ -228,8 +340,9 @@ export function StudentSearch({
       <CardBody className={`${nunito.className} -mt-4 flex w-full flex-row overflow-hidden`}>
         <div className="flex w-max basis-full flex-col gap-1">
           <form className="flex w-full flex-row" action={SearchAction}>
-            <div className="flex w-full">
+            <div className="flex w-full gap-2">
               <StudentAutocomplete options={[]} name={'studentId'} />
+              <PaginatedDropdown itemsPerPage={3} allItems={studentList} setSelectedStudent={setSelectedStudent} />
 
               <Button className="min-w-fit" variant="flat" type="submit">
                 <SimpleLineIconsMagnifier />

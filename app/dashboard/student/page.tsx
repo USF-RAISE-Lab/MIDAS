@@ -35,7 +35,7 @@ export default function Page() {
   const [studentId, setStudentId] = useState<string | undefined>(studentSearchParam!);
 
   useEffect(() => {
-    if (!studentId) {
+    if (false) {
       console.log("studentId is not set yet");
       setStudentId(schoolData.map(student => student.studentid)[0]);
       console.log(studentId);
@@ -43,7 +43,7 @@ export default function Page() {
     const school = midasStore.getStudentsBySchoolId(schoolid);
 
     // todo)) This may cause a bug if there is a user with no associated data at all
-    const student = midasStore.getStudentById(schoolid, studentId!);
+    const student = midasStore.getStudentById(schoolid, studentId!)
     console.log("Individual Student data:", school);
 
     setSchoolData(school);
@@ -106,7 +106,8 @@ export default function Page() {
   return (
     <main className="flex flex-col md:w-[70%] p-4 gap-4 mx-auto">
       <StudentSearch selectedStudent={studentId!} setSelectedStudent={setStudentId}
-        data={{ gradeLevel: student.gradelevel.toString(), gender: student.gender, ethnicity: student.ethnicity, ell: student.ell }} />
+        data={{ gradeLevel: student.gradelevel.toString(), gender: student.gender, ethnicity: student.ethnicity, ell: student.ell }}
+        studentList={schoolData.map(student => student.studentid)} />
 
       <div className="flex md:flex-row flex-col gap-4 md:justify-evenly w-full">
         <RiskCardWithConfidence
