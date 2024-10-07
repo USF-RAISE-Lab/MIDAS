@@ -16,14 +16,14 @@ export async function loadData(schoolId: number) {
       throw new Error("Failed to load data");
     }
 
-    const combinedData = schoolData.map((student: SchoolData) => {
+    const combinedData: SchoolData[] = schoolData.map((student: SchoolData) => {
       const studentRisks = riskData.filter((risk: any) => risk.studentid === student.studentid);
       console.log("STUDENT RISKS");
       console.log(studentRisks);
       const riskObj = {
-        student: {},
-        teacher: {},
-        midas: {}
+        student: { risklevel: "", confidence: "" },
+        teacher: { risklevel: "", confidence: "" },
+        midas: { risklevel: "", confidence: "" }
       };
 
       studentRisks.forEach((risk: any) => {
