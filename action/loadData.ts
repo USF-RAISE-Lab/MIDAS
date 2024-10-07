@@ -1,5 +1,5 @@
 import { FetchSchoolData } from "@/app/api/data/downloadSchoolData";
-import { FetchRiskData } from "@/app/api/data/risk-data/route";
+import { FetchRiskData } from "@/app/api/data/risk-data/get-risk-data";
 import useMidasStore, { SchoolData } from "@/hooks/useSchoolData";
 
 
