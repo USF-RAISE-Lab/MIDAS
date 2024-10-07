@@ -21,7 +21,6 @@ import {
 import useSchoolLevel from '@/hooks/useSchoolLevel';
 import { BounceLoader } from 'react-spinners';
 
-import { CompareSchoolNames } from '../api/file-auth/restrict-csv';
 import useGradeLevel from '@/hooks/useGradeLevel';
 import useClassLevel from '@/hooks/useClassLevel';
 

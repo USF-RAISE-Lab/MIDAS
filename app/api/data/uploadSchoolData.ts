@@ -24,12 +24,15 @@ import { createClient } from "@supabase/supabase-js";
 
 
 const supabaseUrl = 'https://kalbwmivszjzlnepcebm.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey!);
 
 function ValidateColumns() {
 
 }
+
+// todo)) Make
+export async function GET() { }
 
 /**
  * Drops all rows in schooldata which contain the school_id of the current user school_id.
@@ -49,7 +52,7 @@ export async function DropRowsBySchoolId(tableName: string, schoolId: number) {
     console.log("Error deleting rows ", error);
   }
   else {
-    console.log("Deleted rows of school_id ", schoolId);
+    console.log(`Deleted rows of ${tableName}, school_id = ${schoolId}`);
   }
 }
 
