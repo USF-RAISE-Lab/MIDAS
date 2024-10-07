@@ -29,3 +29,8 @@ export async function FetchRiskData(schoolId: number) {
     return data;
   }
 }
+
+// todo)) make
+export async function GET() {
+
+}

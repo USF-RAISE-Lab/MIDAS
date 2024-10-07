@@ -31,3 +31,7 @@ export async function FetchSchoolData(schoolId: number) {
   }
 }
 
+// todo)) Make
+export async function GET() {
+
+}

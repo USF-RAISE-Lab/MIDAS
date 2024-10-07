@@ -31,6 +31,9 @@ function ValidateColumns() {
 
 }
 
+// todo)) Make
+export async function GET() { }
+
 /**
  * Drops all rows in schooldata which contain the school_id of the current user school_id.
  * This will be used upon file upload to prevent duplicate data.
