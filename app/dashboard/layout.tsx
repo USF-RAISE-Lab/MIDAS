@@ -8,7 +8,7 @@ import { getSession, SessionProvider, useSession } from 'next-auth/react';
 import { FetchRiskData, FetchSchoolData } from '../api/data/downloadSchoolData';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { useEffect, useState } from 'react';
-import { loadData } from '../api/data/loadData';
+import { loadData } from '@/action/loadData';
 
 const nunito = Nunito({
   weight: ['200', '300'],
@@ -31,6 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       setSchoolid(schoolid);
     }
     getSchoolId();
+
     loadData(schoolId);
   }, [schoolId]);
 

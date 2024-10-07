@@ -17,8 +17,6 @@ const supabase = createClient(supabaseUrl, supabaseKey!);
  * Includes student demographics, test scores, discplinary action data
  */
 export async function FetchSchoolData(schoolId: number) {
-  console.log("YEEEEE HAWWWW")
-  console.log(schoolId)
   const { data, error } = await supabase
     .from('schooldata')
     .select()
@@ -29,27 +27,6 @@ export async function FetchSchoolData(schoolId: number) {
   }
   else {
     console.log("Successfully fetched schooldata rows")
-    return data;
-  }
-}
-
-/**
- * Fetch risk data from public.schooldata_join_risk
- * Columns: id(riskId), factor(student, teacher, midas), risklevel, confidence, schoolId, studentId
- */
-export async function FetchRiskData(schoolId: number) {
-  const { data, error } = await supabase
-    .from('schooldata_join_risk')
-    .select()
-    .eq('school_id', schoolId)
-    .limit(1000000);
-
-  if (error) {
-    console.log(error);
-  }
-  else {
-    console.log("Successfully fetched risk data rows");
-    console.log(data);
     return data;
   }
 }

@@ -49,7 +49,7 @@ export async function DropRowsBySchoolId(tableName: string, schoolId: number) {
     console.log("Error deleting rows ", error);
   }
   else {
-    console.log("Deleted rows of school_id ", schoolId);
+    console.log(`Deleted rows of ${tableName}, school_id = ${schoolId}`);
   }
 }
 
