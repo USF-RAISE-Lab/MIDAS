@@ -5,7 +5,7 @@ import ToasterProvider from '@/providers/ToastProvider';
 import { SearchContextProvider } from '../context/nav-search-context-provider';
 import { Nunito } from 'next/font/google';
 import { getSession, SessionProvider, useSession } from 'next-auth/react';
-import { FetchRiskData, FetchSchoolData } from '../api/data/downloadSchoolData';
+import { FetchSchoolData } from '../api/data/downloadSchoolData';
 import useMidasStore, { SchoolData } from '@/hooks/useSchoolData';
 import { useEffect, useState } from 'react';
 import { loadData } from '@/action/loadData';
