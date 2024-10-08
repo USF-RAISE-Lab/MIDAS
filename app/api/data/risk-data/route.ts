@@ -16,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseKey!);
  * Fetch risk data from public.schooldata_join_risk
  * Columns: id(riskId), factor(student, teacher, midas), risklevel, confidence, schoolId, studentId
  */
-export async function FetchRiskData(schoolId: number) {
+async function FetchRiskData(schoolId: number) {
   const { data, error } = await supabase
     .from('schooldata_join_risk')
     .select()
