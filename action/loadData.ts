@@ -1,16 +1,20 @@
-import { FetchSchoolData } from "@/app/api/data/downloadSchoolData";
-import { FetchRiskData } from "@/app/api/data/risk-data/get-risk-data";
+//import { FetchSchoolData } from "@/app/api/data/downloadSchoolData";
+//import { FetchRiskData } from "@/app/api/data/risk-data/get-risk-data";
 import useMidasStore, { SchoolData } from "@/hooks/useSchoolData";
 
 
 export async function loadData(schoolId: number) {
   try {
-    //const resSchoolData = await fetch(`/api/data/school-data/school_id=${schoolId}`);
-    //const jsonSchoolData = await resSchoolData.json();
-    //const schoolData = jsonSchoolData.data;
+    const resSchoolData = await fetch(`/api/data/school-data`);
+    const jsonSchoolData = await resSchoolData.json();
+    const schoolData = jsonSchoolData.data;
     //
-    const schoolData = await FetchSchoolData(schoolId);
-    const riskData = await FetchRiskData(schoolId);
+    //const schoolData = await FetchSchoolData(schoolId);
+    //const riskData = await FetchRiskData(schoolId);
+    //
+    const resRiskData = await fetch('/api/data/risk-data')
+    const jsonRiskData = await resRiskData.json();
+    const riskData = jsonRiskData.data;
 
     if (!schoolData || !riskData) {
       throw new Error("Failed to load data");

@@ -4,6 +4,7 @@
  * @since 2024-10-05
  */
 import { SchoolData } from "@/hooks/useSchoolData";
+import { authOptions } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
 import { warn } from "console";
 import { getServerSession } from "next-auth";
@@ -34,22 +35,22 @@ async function FetchSchoolData(schoolId: number): Promise<SchoolData[] | undefin
 
 export async function GET(req: Request): Promise<NextResponse> {
   try {
-    //const session = await getServerSession();
-    //
-    //if (!session) {
-    //  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    //}
+    const session = await getServerSession(authOptions);
 
-    //const schoolId = session.user.school_id;
-    const { searchParams } = new URL(req.url);
-    const param = searchParams.get("school_id");
-    const schoolId = Number(param);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const schoolId = session.user.school_id;
+    //const { searchParams } = new URL(req.url);
+    //const param = searchParams.get("school_id");
+    //const schoolId = Number(param);
 
     if (!schoolId) {
       return NextResponse.json({ error: "school_id not found in user session. " }, { status: 400 });
     }
 
-    const data = await FetchSchoolData(schoolId);
+    const data = await FetchSchoolData(Number(schoolId));
     return NextResponse.json({ data }, { status: 200 });
   }
   catch (error) {
