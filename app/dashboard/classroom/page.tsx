@@ -13,16 +13,15 @@ import { calculateModeConfidence, calculateOccurancePercentages, calculateRiskBy
 import ClassSearch from '@/app/ui/dashboard/cards/search/class-search-card';
 import { GetClassroomOptions } from '@/action/getClassroomOptions';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import { SearchContext } from '@/app/context/nav-search-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 
 export default function Page() {
-  const { data: session } = useSession();
-  const schoolid = session?.user.school_id;
-
   const midasStore = useMidasStore();
+
+  const [schoolid, setSchoolid] = useState<number>(0);
 
   const [classData, setClassData] = useState<SchoolData[]>([]);
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
@@ -33,12 +32,60 @@ export default function Page() {
   const [selectedClass, setSelectedClass] = useState<string>(classSearchParam !== undefined ? classSearchParam! : schoolData.map(student => student.classroom)[0]);
 
   useEffect(() => {
-    const classroom = midasStore.getStudentsByClassroom(schoolid, selectedClass);
-    const school = midasStore.getStudentsBySchoolId(schoolid);
+    const getSchoolId = async () => {
+      let session = await getSession();
+      setSchoolid(session?.user.school_id);
+    }
 
-    setSchoolData(school)
+    getSchoolId()
+
+    const school = midasStore.getStudentsBySchoolId(schoolid);
+    console.log("Student data:", school);
+
+    setSchoolData(school);
+  }, [midasStore, schoolid]);
+
+
+
+
+  useEffect(() => {
+    if (schoolData.length === 0) return; // Wait until schoolData is loaded
+
+
+    if (!selectedClass) {
+
+      const availableClassrooms = GetClassroomOptions(schoolData);
+      if (availableClassrooms.length > 0) {
+        setSelectedClass(availableClassrooms[0]);
+      }
+    }
+
+    const classroom = midasStore.getStudentsByClassroom(schoolid, selectedClass);
     setClassData(classroom);
-  }, [midasStore, selectedClass, schoolid]);
+  }, [midasStore, schoolData, schoolid, selectedClass]);
+
+
+  //useEffect(() => {
+  //  const classroom = midasStore.getStudentsByClassroom(schoolid, selectedClass);
+  //
+  //  const getSchoolId = async () => {
+  //    let session = await getSession();
+  //    setSchoolid(session?.user.school_id);
+  //  }
+  //
+  //  getSchoolId()
+  //
+  //  const school = midasStore.getStudentsBySchoolId(schoolid);
+  //  console.log("Student data:", school);
+  //
+  //  setSchoolData(school);
+  //  //if (classroomSearch === undefined) {
+  //  //  setGradeSearch(GetGradeOptions(schoolData!)[0]);
+  //  //}
+  //
+  //  setSchoolData(school)
+  //  setClassData(classroom);
+  //}, [midasStore, selectedClass, schoolid]);
 
   const dashboardData: DashboardData = {
     midasRiskPercentages: calculateRiskPercentages(classData!, 'midas'),

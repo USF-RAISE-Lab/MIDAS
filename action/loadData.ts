@@ -22,8 +22,6 @@ export async function loadData(schoolId: number) {
 
     const combinedData: SchoolData[] = schoolData.map((student: SchoolData) => {
       const studentRisks = riskData.filter((risk: any) => risk.studentid === student.studentid);
-      console.log("STUDENT RISKS");
-      console.log(studentRisks);
       const riskObj = {
         student: { risklevel: "", confidence: "" },
         teacher: { risklevel: "", confidence: "" },
@@ -31,7 +29,6 @@ export async function loadData(schoolId: number) {
       };
 
       studentRisks.forEach((risk: any) => {
-        console.log(`RISK N: ${risk.factor}`)
         if (risk.factor.toLowerCase() === 'student') {
           riskObj.student = {
             risklevel: risk.risklevel,
