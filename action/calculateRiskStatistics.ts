@@ -40,7 +40,7 @@ export function calculateOccurancePercentages(students: SchoolData[], label: 'od
 
   });
 
-  console.log("Calculated occurance percentages: " + zero.toString() + " " + oneplus.toString() + " " + totalStudents.toString())
+  //console.log("Calculated occurance percentages: " + zero.toString() + " " + oneplus.toString() + " " + totalStudents.toString())
 
   return {
     zero: (zero / totalStudents) * 100,

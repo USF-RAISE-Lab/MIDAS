@@ -20,21 +20,35 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 
 
-  const [schoolId, setSchoolid] = useState<number>(0);
+  const [schoolId, setSchoolId] = useState<number>(0);
+  //useEffect(() => {
+  //
+  //  const getSchoolId = async () => {
+  //
+  //    const session = await getSession();
+  //    const schoolid = session?.user.school_id;
+  //
+  //    setSchoolid(schoolid);
+  //  }
+  //  getSchoolId();
+  //
+  //  loadData(schoolId);
+  //}, [schoolId]);
+  //
   useEffect(() => {
-
     const getSchoolId = async () => {
-
       const session = await getSession();
       const schoolid = session?.user.school_id;
-
-      setSchoolid(schoolid);
-    }
+      setSchoolId(schoolid);  // Set the schoolId here
+    };
     getSchoolId();
+  }, []); // Empty dependency array to run only once on mount
 
-    loadData(schoolId);
+  useEffect(() => {
+    if (schoolId !== null) {
+      loadData(schoolId);  // Only call loadData when schoolId has been set
+    }
   }, [schoolId]);
-
   console.log(schoolId)
 
   return (
