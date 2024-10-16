@@ -10,7 +10,7 @@ import { RiskCard } from '@/app/ui/dashboard/risk-card';
 import { MidasRiskScoreTooltip } from '@/app/ui/textblocks/tooltips';
 import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card';
 import { StudentSearch } from '@/app/ui/dashboard/cards/search/student-search';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 
 interface SearchProps {
@@ -21,8 +21,7 @@ interface SearchProps {
 
 export default function Page() {
 
-  const { data: session } = useSession();
-  const schoolid = session?.user.school_id;
+  const [schoolId, setSchoolId] = useState<number>(0);
 
   const midasStore = useMidasStore();
 
@@ -35,20 +34,39 @@ export default function Page() {
   const [studentId, setStudentId] = useState<string | undefined>(studentSearchParam!);
 
   useEffect(() => {
-    if (false) {
-      console.log("studentId is not set yet");
-      setStudentId(schoolData.map(student => student.studentid)[0]);
-      console.log(studentId);
+    const getSchoolId = async () => {
+      let session = await getSession();
+      setSchoolId(session?.user.school_id);
     }
-    const school = midasStore.getStudentsBySchoolId(schoolid);
 
-    // todo)) This may cause a bug if there is a user with no associated data at all
-    const student = midasStore.getStudentById(schoolid, studentId!)
+    getSchoolId()
+
+    const school = midasStore.getStudentsBySchoolId(schoolId);
+    console.log("Student data:", school);
+
+    const student = midasStore.getStudentById(schoolId, studentId!)
     console.log("Individual Student data:", school);
 
     setSchoolData(school);
     setStudentData(student);
-  }, [midasStore, studentId, schoolid]);
+  }, [midasStore, studentId, schoolId]);
+
+
+  //useEffect(() => {
+  //  if (false) {
+  //    console.log("studentId is not set yet");
+  //    setStudentId(schoolData.map(student => student.studentid)[0]);
+  //    console.log(studentId);
+  //  }
+  //  const school = midasStore.getStudentsBySchoolId(schoolId);
+  //
+  //  // todo)) This may cause a bug if there is a user with no associated data at all
+  //  const student = midasStore.getStudentById(schoolId, studentId!)
+  //  console.log("Individual Student data:", school);
+  //
+  //  setSchoolData(school);
+  //  setStudentData(student);
+  //}, [midasStore, studentId, schoolId]);
 
   // todo)) This is hacky and should be done differently, but it works for now.
   if (studentData[0] === undefined) {
