@@ -14,14 +14,15 @@ import { RiskCardWithConfidence } from '@/app/ui/dashboard/risk-confidence-card'
 import GradeSearch from '@/app/ui/dashboard/cards/search/grade-search-card';
 import { GetGradeOptions } from '@/action/getGradeOptions';
 import { GetClassroomOptions } from '@/action/getClassroomOptions';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 
 
 export default function Page() {
   const { data: session } = useSession();
-  const schoolid = session?.user.school_id;
 
   const midasStore = useMidasStore();
+
+  const [schoolid, setSchoolid] = useState<number>(0);
 
   const [gradeData, setGradeData] = useState<SchoolData[]>([]);
   const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
@@ -31,9 +32,16 @@ export default function Page() {
 
 
   useEffect(() => {
-    // Fetch school data only once based on schoolid
+    const getSchoolId = async () => {
+      let session = await getSession();
+      setSchoolid(session?.user.school_id);
+    }
+
+    getSchoolId()
+
     const school = midasStore.getStudentsBySchoolId(schoolid);
-    console.log("Loaded school data:", school);
+    console.log("Student data:", school);
+
     setSchoolData(school);
   }, [midasStore, schoolid]);
 
