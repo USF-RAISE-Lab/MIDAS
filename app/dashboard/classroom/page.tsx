@@ -36,6 +36,10 @@ export default function Page() {
     const classroom = midasStore.getStudentsByClassroom(schoolid, selectedClass);
     const school = midasStore.getStudentsBySchoolId(schoolid);
 
+    //if (classroomSearch === undefined) {
+    //  setGradeSearch(GetGradeOptions(schoolData!)[0]);
+    //}
+
     setSchoolData(school)
     setClassData(classroom);
   }, [midasStore, selectedClass, schoolid]);
