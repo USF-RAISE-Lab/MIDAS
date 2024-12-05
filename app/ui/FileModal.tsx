@@ -29,6 +29,7 @@ import { useDropzone } from 'react-dropzone';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { DropRowsBySchoolId as DropRowsBySchoolId, JoinWebInput, InsertSchoolData, JoinToRiskScores } from '../api/data/uploadSchoolData';
 import { getSession, SessionContext, SessionProvider, useSession } from 'next-auth/react';
+import { loadData } from '@/action/loadData';
 
 const data_frame: string[] = [
   'odr_f',
@@ -184,7 +185,7 @@ const FileModal = () => {
 
       console.log("UploadData", uploadData);
 
-      // Perform the database operations (await ensures they complete before proceeding)
+      // Perform the database operations 
       await DropRowsBySchoolId('schooldata', schoolid);
       await InsertSchoolData(uploadData);
 
@@ -201,6 +202,7 @@ const FileModal = () => {
 
       // Refresh the page to reflect changes
       router.refresh();
+      loadData(schoolid);
 
       // Show success message and reset the form
       toast.success('File uploaded');
